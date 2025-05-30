@@ -22,7 +22,7 @@ const CarManagement = () => {
   const apiUrl = window.ENV?.API_URL || "http://localhost:80";
   useEffect(() => {
     axios
-      .get(`http://localhost/car`, {
+      .get(`${apiUrl}/car`, {
         params: {
           carCompanyNo: carCompanyNo,
           carTypeNo: carTypeNo,
@@ -42,7 +42,7 @@ const CarManagement = () => {
 
   const handleSearch = () => {
     axios
-      .get(`http://localhost/car`, {
+      .get(`${apiUrl}/car`, {
         params: {
           carCompanyNo: carCompanyNo,
           carTypeNo: carTypeNo,
