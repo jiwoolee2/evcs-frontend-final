@@ -10,7 +10,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import AutoAwesomeMotionOutlinedIcon from "@mui/icons-material/AutoAwesomeMotionOutlined";
 import { useNavigate } from "react-router-dom";
-import { useRef, useState, useEffect, use } from "react";
+import { useRef, useState, useEffect } from "react";
 import DriveRouteMap from "../DriveRouteMap/DriveRouteMap";
 import axios from "axios";
 import { useAuth } from "../../../Context/AuthContext/AuthContext";
@@ -116,11 +116,6 @@ const DRBoard = () => {
     }
   };
 
-  const handleDeleteImage = (indexToDelete) => {
-    setImagesUrl((prev) => prev.filter((_, index) => index !== indexToDelete));
-    setBoardImage((prev) => prev.filter((_, index) => index !== indexToDelete));
-  };
-
   const handleImageChange = (e) => {
     const images = e.target.files;
     let imagesUrlList = [...imagesUrl]; // imagesUrl배열을 펼쳐서 [] 안에 집어넣음
@@ -172,11 +167,7 @@ const DRBoard = () => {
         if (currentPage === 1) {
           setBoards([...drBoard]);
           setBoardImages([...drBoardImages]);
-        } else {
-          setBoards([...drBoard]);
-          setBoardImages([...drBoardImages]);
         }
-
         if (drBoard.length % 10 != 0) {
           setHasMore(false);
         }
@@ -399,6 +390,7 @@ const DRBoard = () => {
         });
     }
   };
+
   // ----------------------댓글 조회----------------------
   useEffect(() => {
     if (!commentTargetBoard) return;
