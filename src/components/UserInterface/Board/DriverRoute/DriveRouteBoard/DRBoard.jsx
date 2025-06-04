@@ -168,6 +168,7 @@ const DRBoard = () => {
     axios
       .get(`${apiUrl}/driveRouteBoard/${currentPage}`)
       .then((result) => {
+        console.log("게시물 조회 성공:", result.data);
         const { drBoard, drBoardImages } = result.data;
         if (currentPage === 1) {
           setBoards([...drBoard]);
