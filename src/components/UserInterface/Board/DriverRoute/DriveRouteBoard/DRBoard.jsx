@@ -10,7 +10,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import AutoAwesomeMotionOutlinedIcon from "@mui/icons-material/AutoAwesomeMotionOutlined";
 import { useNavigate } from "react-router-dom";
-import { useRef, useState, useEffect, use } from "react";
+import { useRef, useState, useEffect } from "react";
 import DriveRouteMap from "../DriveRouteMap/DriveRouteMap";
 import axios from "axios";
 import { useAuth } from "../../../Context/AuthContext/AuthContext";
@@ -67,6 +67,7 @@ import {
   CommentTop,
 } from "./DRBoard.styles";
 import { CustomPrev, CustomNext } from "../CustomSlides/CustomSlides";
+import SelectBoard from "./BoardCRUD/SelectBoard";
 
 const DRBoard = () => {
   const [openCommentModal, setOpenCommentModal] = useState(false);
@@ -84,11 +85,10 @@ const DRBoard = () => {
   const [boardContent, setBoardContent] = useState("");
   const { auth } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
+  const [boards, setBoards] = useState([]);
   const [currentCommentPage, setCurrentCommentPage] = useState(1);
   const [commentInfo, setCommentInfo] = useState([]);
   const [hasMoreComment, setHasMoreComment] = useState(true);
-  const [boards, setBoards] = useState([]);
-  const [boardImages, setBoardImages] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [srcMap, setSrcMap] = useState("");
   const [commentTargetBoard, setCommentTargetBoard] = useState(null);
@@ -114,11 +114,6 @@ const DRBoard = () => {
       ref.current.value = null;
       ref.current.click();
     }
-  };
-
-  const handleDeleteImage = (indexToDelete) => {
-    setImagesUrl((prev) => prev.filter((_, index) => index !== indexToDelete));
-    setBoardImage((prev) => prev.filter((_, index) => index !== indexToDelete));
   };
 
   const handleImageChange = (e) => {
@@ -164,28 +159,6 @@ const DRBoard = () => {
   }, [commentTargetBoard]);
 
   // ----------------------게시물 조회----------------------
-  useEffect(() => {
-    axios
-      .get(`${apiUrl}/driveRouteBoard/${currentPage}`)
-      .then((result) => {
-        console.log("게시물 조회 성공:", result.data);
-        const { drBoard, drBoardImages } = result.data;
-        if (currentPage === 1) {
-          setBoards([...drBoard]);
-          setBoardImages([...drBoardImages]);
-        } else {
-          setBoards([...drBoard]);
-          setBoardImages([...drBoardImages]);
-        }
-
-        if (drBoard.length % 10 != 0) {
-          setHasMore(false);
-        }
-      })
-      .catch((error) => {
-        console.error("게시물 조회 실패:", error);
-      });
-  }, [currentPage]);
 
   const clickToMore = () => {
     setCurrentPage((currentPage) => currentPage + 1);
@@ -193,7 +166,7 @@ const DRBoard = () => {
 
   // -----------------게시물 추가----------------------
   const handleInsertBoard = async () => {
-    if (!boardContent) {
+    if (!boardContent || boardContent.trim() === "") {
       alert("내용을 입력해주세요.");
       return;
     } else if (boardContent.length < 5 || boardContent.length > 200) {
@@ -243,9 +216,8 @@ const DRBoard = () => {
             },
           })
           .then((res) => {
-            const { drBoard, drBoardImages } = res.data;
+            const drBoard = res.data;
             setBoards([...drBoard]);
-            setBoardImages([...drBoardImages]);
             setCurrentPage(1); // 페이지 초기화
 
             return axios.get(`${apiUrl}/driveRouteBoard/selectLikes`, {
@@ -281,9 +253,7 @@ const DRBoard = () => {
     setBoardContent(board.boardContent);
     setMapUrl(board.driveRouteImage); // 드라이브 경로 이미지
     setImagesUrl(
-      boardImages
-        .filter((image) => image.boardNo == board.boardNo)
-        .map((image) => image.boardImage) // URL만 추출
+      board.drBoardImage.map((image) => image.boardImage) // URL만 추출
     );
     setBoardImage([]); // 실제 파일은 없지만 placeholder로라도 빈 배열로 초기화
     setUpdateBoardNo(board.boardNo);
@@ -342,9 +312,8 @@ const DRBoard = () => {
             },
           })
           .then((res) => {
-            const { drBoard, drBoardImages } = res.data;
+            const drBoard = res.data;
             setBoards([...drBoard]);
-            setBoardImages([...drBoardImages]);
             setCurrentPage(1); // 페이지 초기화
 
             return axios.get(`${apiUrl}/driveRouteBoard/selectLikes`, {
@@ -380,9 +349,8 @@ const DRBoard = () => {
               },
             })
             .then((res) => {
-              const { drBoard, drBoardImages } = res.data;
+              const drBoard = res.data;
               setBoards([...drBoard]);
-              setBoardImages([...drBoardImages]);
               setCurrentPage(1); // 페이지 초기화
 
               return axios.get(`${apiUrl}/driveRouteBoard/selectLikes`, {
@@ -400,6 +368,7 @@ const DRBoard = () => {
         });
     }
   };
+
   // ----------------------댓글 조회----------------------
   useEffect(() => {
     if (!commentTargetBoard) return;
@@ -628,8 +597,16 @@ const DRBoard = () => {
       });
   };
   console.log("로그인한 유저 번호:", auth.user.memberNo);
+
   return (
     <>
+      <SelectBoard
+        currentPage={currentPage}
+        setBoards={setBoards}
+        apiUrl={apiUrl}
+        setHasMore={setHasMore}
+      />
+
       <RentContainerDiv>
         {!openPhotoModal &&
           !openCommentModal &&
@@ -675,22 +652,20 @@ const DRBoard = () => {
                     style={{ width: "100%", height: "100%" }}
                   >
                     <Slider {...settings}>
-                      {boardImages
-                        .filter((item) => item.boardNo === board.boardNo)
-                        .map((item, index) => (
-                          <div key={index}>
-                            <img
-                              src={item.boardImage}
-                              style={{
-                                width: "100%",
-                                maxHeight: "630px",
-                                objectFit: "cover",
-                                backgroundRepeat: "no-repeat",
-                              }}
-                              alt={`preview-${index}`}
-                            />
-                          </div>
-                        ))}
+                      {board.drBoardImage.map((item, index) => (
+                        <div key={index}>
+                          <img
+                            src={item.boardImage}
+                            style={{
+                              width: "100%",
+                              maxHeight: "630px",
+                              objectFit: "cover",
+                              backgroundRepeat: "no-repeat",
+                            }}
+                            alt={`preview-${index}`}
+                          />
+                        </div>
+                      ))}
                     </Slider>
                   </div>
                 </Images>
