@@ -14,7 +14,6 @@ import { useRef, useState, useEffect } from "react";
 import DriveRouteMap from "../DriveRouteMap/DriveRouteMap";
 import axios from "axios";
 import { useAuth } from "../../../Context/AuthContext/AuthContext";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import {
   H1,
@@ -68,7 +67,8 @@ import {
 } from "./DRBoard.styles";
 import { CustomPrev, CustomNext } from "../CustomSlides/CustomSlides";
 import SelectBoard from "./BoardCRUD/SelectBoard";
-
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import BoardModal from "./BoardCRUD/BoardModal";
 const DRBoard = () => {
   const [openCommentModal, setOpenCommentModal] = useState(false);
   const [openPhotoModal, setopenPhotoModal] = useState(false);
@@ -96,12 +96,22 @@ const DRBoard = () => {
     boardNo: null,
     commentContent: null,
   });
-  const [boardLikesInfo, setBoardLikesInfo] = useState([]);
-  const [isUpdateMode, setIsUpdateMode] = useState(true);
+  const [isInsertMode, setIsInsertMode] = useState(true);
   const [updateBoardNo, setUpdateBoardNo] = useState(null);
   const [editingCommentNo, setEditingCommentNo] = useState(null); // 수정 중인 댓글 번호
   const [editedContent, setEditedContent] = useState(""); // 임시 수정 값 저장
+  const [boardLikesInfo, setBoardLikesInfo] = useState([]);
   const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    swipe: false,
+    nextArrow: <CustomNext />,
+    prevArrow: <CustomPrev />,
+  };
 
   useEffect(() => {
     if (mapUrl !== "") {
@@ -130,50 +140,34 @@ const DRBoard = () => {
     console.log(imagesUrlList);
   };
 
-  const handleDriveRoute = (e) => {
-    setOpenDriveRoute(true);
-    setSrcMap(e.driveRouteImage);
+  const handleContentValue = (e) => {
+    setBoardContent(e.target.value);
   };
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    swipe: false,
-    nextArrow: <CustomNext />,
-    prevArrow: <CustomPrev />,
-  };
-
-  useEffect(() => {
-    if (
-      commentTargetBoard?.boardNo &&
-      comment.boardNo !== commentTargetBoard.boardNo
-    ) {
-      setComment((prev) => ({
-        ...prev,
-        boardNo: commentTargetBoard.boardNo,
-      }));
-    }
-  }, [commentTargetBoard]);
-
-  // ----------------------게시물 조회----------------------
-
-  const clickToMore = () => {
-    setCurrentPage((currentPage) => currentPage + 1);
-  };
-
-  // -----------------게시물 추가----------------------
-  const handleInsertBoard = async () => {
-    if (!boardContent || boardContent.trim() === "") {
+  const handleInsertBoard = async (
+    updateBoardNo,
+    boardContent,
+    boardImage,
+    mapUrl
+  ) => {
+    console.log(
+      "boardNo:",
+      updateBoardNo,
+      "boardContent:",
+      boardContent,
+      "boardImage:",
+      boardImage,
+      "mapUrl:",
+      mapUrl
+    );
+    if (!boardContent || boardContent.trim === "") {
       alert("내용을 입력해주세요.");
+      return;
+    } else if (boardImage.length > 10 || boardImage.length < 2) {
+      alert("이미지는 2장 이상 넣어주세요.");
       return;
     } else if (boardContent.length < 5 || boardContent.length > 200) {
       alert("내용은 5자 이상 200자 이하로 입력해주세요.");
-      return;
-    } else if (boardImage.length < 2 || boardImage.length > 10) {
-      alert("사진을 2장 이상 10장 이하로로 첨부해주세요.");
       return;
     } else if (mapUrl === "") {
       alert("드라이브 루트를 선택해주세요.");
@@ -183,7 +177,6 @@ const DRBoard = () => {
     const formData = new FormData();
     formData.append("boardContent", boardContent);
     formData.append("boardWriter", auth.user.memberNo);
-
     boardImage.forEach((boardFiles) => {
       formData.append("boardFiles", boardFiles);
     });
@@ -217,58 +210,32 @@ const DRBoard = () => {
           })
           .then((res) => {
             const drBoard = res.data;
-            setBoards([...drBoard]);
-            setCurrentPage(1); // 페이지 초기화
-
-            return axios.get(`${apiUrl}/driveRouteBoard/selectLikes`, {
-              headers: {
-                Authorization: `Bearer ${auth.user.accessToken}`,
-              },
-            });
-          })
-          .then((res) => {
-            setBoardLikesInfo([...res.data]);
-          })
-          .catch((err) => {
-            console.error("게시물/좋아요 재조회 실패", err);
+            fetchBoards(1);
           });
       });
   };
-  const handleContentValue = (e) => {
-    setBoardContent(e.target.value);
-  };
 
-  const handleCommentList = (board) => {
-    setCommentTargetBoard({
-      memberNickName: board.memberNickName,
-      memberNo: board.memberNo,
-      boardNo: board.boardNo,
-      boardContent: board.boardContent,
-    });
-    setOpenCommentModal(true);
-  };
-
-  // ----------------------게시물 수정----------------------
-  const handleUpdate = (board) => {
-    setBoardContent(board.boardContent);
-    setMapUrl(board.driveRouteImage); // 드라이브 경로 이미지
-    setImagesUrl(
-      board.drBoardImage.map((image) => image.boardImage) // URL만 추출
+  const handleUpdateBoard = async (
+    updateBoardNo,
+    boardContent,
+    boardImage,
+    mapUrl
+  ) => {
+    console.log(
+      "boardNo:",
+      updateBoardNo,
+      "boardContent:",
+      boardContent,
+      "boardImage:",
+      boardImage,
+      "mapUrl:",
+      mapUrl
     );
-    setBoardImage([]); // 실제 파일은 없지만 placeholder로라도 빈 배열로 초기화
-    setUpdateBoardNo(board.boardNo);
-    setIsUpdateMode(false);
-    setopenPhotoModal(true); // 모달 열기
-  };
-  const handleUpdateBoard = async () => {
-    if (!boardContent) {
+    if (!boardContent || boardContent.trim === "") {
       alert("내용을 입력해주세요.");
       return;
     } else if (boardContent.length < 5 || boardContent.length > 200) {
       alert("내용은 5자 이상 200자 이하로 입력해주세요.");
-      return;
-    } else if (boardImage.length > 10) {
-      alert("사진을 10장 이하로로 첨부해주세요.");
       return;
     } else if (mapUrl === "") {
       alert("드라이브 루트를 선택해주세요.");
@@ -276,10 +243,9 @@ const DRBoard = () => {
     }
 
     const formData = new FormData();
-
-    formData.append("boardNo", updateBoardNo);
     formData.append("boardContent", boardContent);
     formData.append("boardWriter", auth.user.memberNo);
+    formData.append("boardNo", updateBoardNo);
     boardImage.forEach((boardFiles) => {
       formData.append("boardFiles", boardFiles);
     });
@@ -313,60 +279,46 @@ const DRBoard = () => {
           })
           .then((res) => {
             const drBoard = res.data;
-            setBoards([...drBoard]);
-            setCurrentPage(1); // 페이지 초기화
-
-            return axios.get(`${apiUrl}/driveRouteBoard/selectLikes`, {
-              headers: {
-                Authorization: `Bearer ${auth.user.accessToken}`,
-              },
-            });
-          })
-          .then((res) => {
-            setBoardLikesInfo([...res.data]);
-          })
-          .catch((err) => {
-            console.error("게시물/좋아요 재조회 실패", err);
+            fetchBoards(1);
           });
       });
   };
 
-  // ----------------------게시물 삭제----------------------
-  const handleDelete = (boardNo) => {
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      axios
-        .delete(`${apiUrl}/driveRouteBoard/delete/${boardNo}`, {
-          headers: {
-            Authorization: `Bearer ${auth.user.accessToken}`,
-          },
-        })
-        .then((result) => {
-          alert("게시물이 삭제되었습니다.");
-          axios
-            .get(`${apiUrl}/driveRouteBoard/1`, {
-              headers: {
-                Authorization: `Bearer ${auth.user.accessToken}`,
-              },
-            })
-            .then((res) => {
-              const drBoard = res.data;
-              setBoards([...drBoard]);
-              setCurrentPage(1); // 페이지 초기화
-
-              return axios.get(`${apiUrl}/driveRouteBoard/selectLikes`, {
-                headers: {
-                  Authorization: `Bearer ${auth.user.accessToken}`,
-                },
-              });
-            })
-            .then((res) => {
-              setBoardLikesInfo([...res.data]);
-            })
-            .catch((err) => {
-              console.error("게시물/좋아요 재조회 실패", err);
-            });
-        });
+  useEffect(() => {
+    if (
+      commentTargetBoard?.boardNo &&
+      comment.boardNo !== commentTargetBoard.boardNo
+    ) {
+      setComment((prev) => ({
+        ...prev,
+        boardNo: commentTargetBoard.boardNo,
+      }));
     }
+  }, [commentTargetBoard]);
+
+  // ----------------------게시물 조회----------------------
+
+  useEffect(() => {
+    axios
+      .get(`${apiUrl}/driveRouteBoard/${currentPage}`)
+      .then((result) => {
+        console.log("게시물 조회 결과:", result.data.data.drBoard);
+        const drBoard = result.data.data.drBoard;
+        if (currentPage === 1) {
+          setBoards([...drBoard]);
+        }
+
+        if (drBoard.length % 10 != 0) {
+          setHasMore(false);
+        }
+      })
+      .catch((error) => {
+        console.error("게시물 조회 실패:", error);
+      });
+  }, [currentPage]);
+
+  const clickToMore = () => {
+    setCurrentPage((currentPage) => currentPage + 1);
   };
 
   // ----------------------댓글 조회----------------------
@@ -596,17 +548,72 @@ const DRBoard = () => {
         console.log(error);
       });
   };
+
+  const handleCommentList = (board) => {
+    setCommentTargetBoard({
+      memberNickName: board.memberNickName,
+      memberNo: board.memberNo,
+      boardNo: board.boardNo,
+      boardContent: board.boardContent,
+    });
+    setOpenCommentModal(true);
+  };
+
+  const handleDriveRoute = (e) => {
+    setOpenDriveRoute(true);
+    setSrcMap(e.driveRouteImage);
+  };
+
+  const handleUpdateBtn = (board) => {
+    setBoardContent(board.boardContent);
+    setMapUrl(board.driveRouteImage.driveRouteImage); // 드라이브 경로 이미지
+    setImagesUrl(
+      board.drBoardImage.map((image) => image.boardImage) // URL만 추출
+    );
+    setUpdateBoardNo(board.boardNo);
+    setIsInsertMode(false);
+    setopenPhotoModal(true); // 모달 열기
+  };
+
+  const handleDelete = (boardNo) => {
+    if (window.confirm("정말 삭제하시겠습니까?")) {
+      axios
+        .delete(`${apiUrl}/driveRouteBoard/delete/${boardNo}`, {
+          headers: {
+            Authorization: `Bearer ${auth.user.accessToken}`,
+          },
+        })
+        .then((result) => {
+          alert("게시물이 삭제되었습니다.");
+          fetchBoards(1);
+        })
+        .catch((error) => {
+          console.error("게시물 삭제 실패", error);
+          alert("게시물 삭제에 실패했습니다.");
+        });
+    }
+  };
+
+  const fetchBoards = (page = 1) => {
+    axios
+      .get(`${apiUrl}/driveRouteBoard/${page}`, {
+        headers: {
+          Authorization: `Bearer ${auth.user.accessToken}`,
+        },
+      })
+      .then((res) => {
+        setBoards(res.data.data.drBoard);
+        setCurrentPage(page); // 페이지까지 업데이트
+      })
+      .catch((error) => {
+        console.error("게시물 조회 실패", error);
+      });
+  };
+
   console.log("로그인한 유저 번호:", auth.user.memberNo);
 
   return (
     <>
-      <SelectBoard
-        currentPage={currentPage}
-        setBoards={setBoards}
-        apiUrl={apiUrl}
-        setHasMore={setHasMore}
-      />
-
       <RentContainerDiv>
         {!openPhotoModal &&
           !openCommentModal &&
@@ -623,113 +630,29 @@ const DRBoard = () => {
           <br />
           <InsertButton
             onClick={() => {
-              setopenPhotoModal(true), setIsUpdateMode(true);
+              setopenPhotoModal(true), setIsInsertMode(true);
             }}
           >
             <AddBoxOutlinedIcon /> 게시물 만들기
           </InsertButton>
           <br />
 
-          <Wrapper>
-            {boards.map((board, i) => (
-              <ContentBox key={i}>
-                <TopBar>
-                  <NickName>{board.memberNickName} 님의 게시글</NickName>
-                  {board.boardWriter == auth.user.memberNo && (
-                    <ButtonGroup>
-                      <UpdateButton onClick={() => handleUpdate(board)}>
-                        수정
-                      </UpdateButton>
-                      <DeleteButton onClick={() => handleDelete(board.boardNo)}>
-                        삭제
-                      </DeleteButton>
-                    </ButtonGroup>
-                  )}
-                </TopBar>
-                <Images>
-                  <div
-                    className="slider-container"
-                    style={{ width: "100%", height: "100%" }}
-                  >
-                    <Slider {...settings}>
-                      {board.drBoardImage.map((item, index) => (
-                        <div key={index}>
-                          <img
-                            src={item.boardImage}
-                            style={{
-                              width: "100%",
-                              maxHeight: "630px",
-                              objectFit: "cover",
-                              backgroundRepeat: "no-repeat",
-                            }}
-                            alt={`preview-${index}`}
-                          />
-                        </div>
-                      ))}
-                    </Slider>
-                  </div>
-                </Images>
-                <PostIcon>
-                  {boardLikesInfo.some(
-                    (item) => item.boardNo == board.boardNo
-                  ) ? (
-                    <FavoriteRoundedIcon
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleLikeCancelBtn(board.boardNo)}
-                    />
-                  ) : (
-                    <FavoriteBorderIcon
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleLikeBtn(board.boardNo)}
-                    />
-                  )}
-
-                  <ChatIcon
-                    onClick={() => handleCommentList(board)}
-                    style={{ cursor: "pointer" }}
-                  />
-                  <DriveRouteIcon
-                    style={{
-                      cursor: "pointer",
-                      textAlign: "right",
-                    }}
-                    onClick={() => handleDriveRoute(board)}
-                  >
-                    <DriveEtaTwoToneIcon />
-                    드라이브 경로
-                  </DriveRouteIcon>
-                </PostIcon>
-                {board.likeCount > 0 && (
-                  <span
-                    style={{
-                      marginLeft: "15px",
-                      marginBottom: "20px",
-                      fontWeight: "bold",
-                      color: "#949393",
-                    }}
-                  >
-                    {board.likeCount}명이 좋아합니다
-                  </span>
-                )}
-
-                <Content expanded={!!expandedPost[board.boardNo]}>
-                  {board.boardContent}
-                </Content>
-                {board.boardContent.length > 80 && (
-                  <MoreText
-                    onClick={() =>
-                      setExpandedPost((prev) => ({
-                        ...prev,
-                        [board.boardNo]: !prev[board.boardNo],
-                      }))
-                    }
-                  >
-                    {expandedPost[board.boardNo] ? "접기" : "...더보기"}
-                  </MoreText>
-                )}
-              </ContentBox>
-            ))}
-          </Wrapper>
+          <SelectBoard
+            setCurrentPage={setCurrentPage}
+            boards={boards}
+            setBoards={setBoards}
+            setBoardLikesInfo={setBoardLikesInfo}
+            boardLikesInfo={boardLikesInfo}
+            expandedPost={expandedPost}
+            auth={auth}
+            settings={settings}
+            handleUpdateBtn={handleUpdateBtn}
+            handleDelete={handleDelete}
+            handleCommentList={handleCommentList}
+            handleDriveRoute={handleDriveRoute}
+            handleLikeCancelBtn={handleLikeCancelBtn}
+            handleLikeBtn={handleLikeBtn}
+          />
           {hasMore && (
             <MoreButtonWrapper>
               <StyledMoreButton onClick={clickToMore}>
@@ -739,236 +662,34 @@ const DRBoard = () => {
             </MoreButtonWrapper>
           )}
 
-          {/* 게시물 만들기(사진설정) 모달 */}
-          {openPhotoModal && (
-            <ModalWrapper>
-              <CloseBtn
-                onClick={() => {
-                  setopenPhotoModal(false);
-                  setImagesUrl([]);
-                  setMapUrl("");
-                }}
-              >
-                <CloseRoundedIcon style={{ fontSize: "40px" }} />
-              </CloseBtn>
-              <ModalLabel>
-                <ModalHeader>
-                  {isUpdateMode ? <>새 게시물 만들기</> : <>게시물 수정하기</>}
-                  <ModalSubmit
-                    onClick={() => {
-                      setOpenRouteModal(true);
-                      setopenPhotoModal(false);
-                    }}
-                  >
-                    다음
-                  </ModalSubmit>
-                </ModalHeader>
-                <ModalContent>
-                  <input
-                    style={{ display: "none" }}
-                    type="file"
-                    ref={ref}
-                    onChange={handleImageChange}
-                    accept="image/*"
-                    multiple
-                  />
-                  {imagesUrl == "" ? (
-                    <>
-                      <div
-                        style={{
-                          width: "200px",
-                          height: "50px",
-                          position: "fixed",
-                          right: "400px",
-                          top: "300px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <InsertPhotoRoundedIcon />
-                        <Button variant="primary" onClick={fileHandler}>
-                          사진을 선택해주세요
-                        </Button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div
-                        className="slider-container"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                        }}
-                      >
-                        {imagesUrl.length === 1 ? (
-                          <>
-                            {imagesUrl.map((url, index) => (
-                              <div key={index} style={{ position: "relative" }}>
-                                <img
-                                  src={url}
-                                  style={{
-                                    width: "100%",
-                                    maxHeight: "630px",
-                                    objectFit: "cover",
-                                    backgroundRepeat: "no-repeat",
-                                  }}
-                                  alt={`preview-${index}`}
-                                />
-                              </div>
-                            ))}
-                          </>
-                        ) : (
-                          <Slider {...settings}>
-                            {imagesUrl.map((url, index) => (
-                              <div key={index} style={{ position: "relative" }}>
-                                <img
-                                  src={url}
-                                  style={{
-                                    width: "100%",
-                                    maxHeight: "630px",
-                                    objectFit: "cover",
-                                    backgroundRepeat: "no-repeat",
-                                  }}
-                                  alt={`preview-${index}`}
-                                />
-                              </div>
-                            ))}
-                          </Slider>
-                        )}
-                      </div>
-                      <AutoAwesomeMotionOutlinedIcon
-                        style={{
-                          position: "absolute",
-                          bottom: "5px",
-                          right: "20px",
-                          fontSize: "30px",
-                          color: "#fff",
-                          backgroundColor: "rgba(0,0,0,0.4)",
-                          borderRadius: "50%",
-                          padding: "5px",
-                          cursor: "pointer",
-                        }}
-                        onClick={fileHandler}
-                      />
-                    </>
-                  )}
-                </ModalContent>
-              </ModalLabel>
-            </ModalWrapper>
-          )}
-
-          {/* 경로설정 및 내용작성 모달 */}
-          {openRouteModal && (
-            <ModalWrapper>
-              <CloseBtn
-                onClick={() => {
-                  setOpenRouteModal(false);
-                  setImagesUrl([]);
-                  setMapUrl("");
-                }}
-              >
-                <CloseRoundedIcon style={{ fontSize: "40px" }} />
-              </CloseBtn>
-              <ModalLabel>
-                <ModalHeader>
-                  {isUpdateMode ? (
-                    <>
-                      새 게시물 만들기
-                      <ModalSubmit onClick={handleInsertBoard}>
-                        공유하기
-                      </ModalSubmit>
-                    </>
-                  ) : (
-                    <>
-                      게시물 수정하기
-                      <ModalSubmit onClick={handleUpdateBoard}>
-                        수정하기
-                      </ModalSubmit>
-                    </>
-                  )}
-                  <ModalBack
-                    onClick={() => {
-                      setOpenRouteModal(false);
-                      setopenPhotoModal(true);
-                      setMapUrl("");
-                    }}
-                  >
-                    이전
-                  </ModalBack>
-                </ModalHeader>
-                <ModalContent>
-                  <LeftContent>
-                    {mapUrl == "" ? (
-                      <>
-                        <Button
-                          variant="primary"
-                          onClick={() => setOpenMapModal(true)}
-                        >
-                          드라이브 루트 선택하기
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <DriveRoute
-                          onClick={() => setOpenMapModal(true)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <MapImg src={mapUrl} alt="지도지도" />
-                        </DriveRoute>
-                      </>
-                    )}
-                  </LeftContent>
-                  <RightContent>
-                    <DriveContent>
-                      <Textarea
-                        type="text"
-                        onChange={handleContentValue}
-                        placeholder="내용을 작성해주세요"
-                        value={boardContent}
-                      ></Textarea>
-                    </DriveContent>
-                  </RightContent>
-                </ModalContent>
-              </ModalLabel>
-            </ModalWrapper>
-          )}
-
-          {/* 드라이브 경로 모달 */}
-          {openMapModal && (
-            <ModalWrapper>
-              <CloseBtn onClick={() => setOpenMapModal(false)}>
-                <CloseRoundedIcon style={{ fontSize: "40px" }} />
-              </CloseBtn>
-              <ModalLabel>
-                <ModalHeader>드라이브 경로 선택</ModalHeader>
-
-                <DriveRouteMap mapUrl={(url) => setMapUrl(url)} />
-              </ModalLabel>
-            </ModalWrapper>
-          )}
-
-          {/* 드라이브 경로 이미지 */}
-          {openDriveRoute && (
-            <ModalWrapper>
-              <CloseBtn onClick={() => setOpenDriveRoute(false)}>
-                <CloseRoundedIcon style={{ fontSize: "40px" }} />
-              </CloseBtn>
-              <ModalLabel>
-                <ModalHeader>드라이브 경로</ModalHeader>
-                <ModalDriveRoute>
-                  <ModalDriveRouteImg
-                    src={srcMap}
-                    alt="드라이브 경로"
-                    style={{
-                      width: "100%",
-                      maxHeight: "630px",
-                      objectFit: "cover",
-                      backgroundRepeat: "none",
-                    }}
-                  />
-                </ModalDriveRoute>
-              </ModalLabel>
-            </ModalWrapper>
-          )}
+          <BoardModal
+            updateBoardNo={updateBoardNo}
+            boardImage={boardImage}
+            openPhotoModal={openPhotoModal}
+            setOpenPhotoModal={setopenPhotoModal}
+            openRouteModal={openRouteModal}
+            setOpenRouteModal={setOpenRouteModal}
+            openMapModal={openMapModal}
+            setOpenMapModal={setOpenMapModal}
+            openDriveRoute={openDriveRoute}
+            setOpenDriveRoute={setOpenDriveRoute}
+            imagesUrl={imagesUrl}
+            setImagesUrl={setImagesUrl}
+            mapUrl={mapUrl}
+            setMapUrl={setMapUrl}
+            boardContent={boardContent}
+            setBoardContent={setBoardContent}
+            isInsertMode={isInsertMode}
+            setIsInsertMode={setIsInsertMode}
+            auth={auth}
+            settings={settings}
+            handleUpdateBoard={handleUpdateBoard}
+            handleInsertBoard={handleInsertBoard}
+            handleContentValue={handleContentValue}
+            handleImageChange={handleImageChange}
+            fileHandler={fileHandler}
+            ref={ref}
+          />
 
           {/* 댓글 모달 */}
           {openCommentModal && (
