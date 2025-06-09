@@ -600,13 +600,6 @@ const DRBoard = () => {
 
   return (
     <>
-      <SelectBoard
-        currentPage={currentPage}
-        setBoards={setBoards}
-        apiUrl={apiUrl}
-        setHasMore={setHasMore}
-      />
-
       <RentContainerDiv>
         {!openPhotoModal &&
           !openCommentModal &&
@@ -629,6 +622,13 @@ const DRBoard = () => {
             <AddBoxOutlinedIcon /> 게시물 만들기
           </InsertButton>
           <br />
+
+          <SelectBoard
+            currentPage={currentPage}
+            setBoards={setBoards}
+            apiUrl={apiUrl}
+            setHasMore={setHasMore}
+          />
 
           <Wrapper>
             {boards.map((board, i) => (
