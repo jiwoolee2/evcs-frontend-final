@@ -5,6 +5,7 @@ import InsertPhotoRoundedIcon from "@mui/icons-material/InsertPhotoRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import AutoAwesomeMotionOutlinedIcon from "@mui/icons-material/AutoAwesomeMotionOutlined";
 import DriveRouteMap from "../../DriveRouteMap/DriveRouteMap";
+import axios from "axios";
 import {
   ModalWrapper,
   ModalLabel,
@@ -25,7 +26,6 @@ import {
 
 const BoardModal = ({
   updateBoardNo,
-  boardImage,
   openPhotoModal,
   setOpenPhotoModal,
   openRouteModal,
@@ -34,6 +34,8 @@ const BoardModal = ({
   setOpenMapModal,
   openDriveRoute,
   setOpenDriveRoute,
+  boardImage,
+  setBoardImage,
   imagesUrl,
   setImagesUrl,
   mapUrl,
@@ -44,14 +46,177 @@ const BoardModal = ({
   setIsInsertMode,
   auth,
   settings,
-  handleUpdateBoard,
-  handleInsertBoard,
   handleContentValue,
-  handleImageChange,
-  fileHandler,
   ref,
 }) => {
   const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+
+  useEffect(() => {
+    if (mapUrl !== "") {
+      setOpenMapModal(false);
+    }
+  }, [mapUrl]);
+
+  const fileHandler = () => {
+    if (ref.current) {
+      ref.current.value = null;
+      ref.current.click();
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const images = e.target.files;
+    let imagesUrlList = [...imagesUrl]; // imagesUrl배열을 펼쳐서 [] 안에 집어넣음
+    let imageLength = images.length > 10 ? 10 : images.length;
+
+    for (let i = 0; i < imageLength; i++) {
+      setBoardImage((prev) => [...prev, images[i]]);
+      const currentImageUrl = URL.createObjectURL(images[i]);
+      imagesUrlList.push(currentImageUrl);
+    }
+    setImagesUrl(imagesUrlList);
+    console.log(imagesUrlList);
+  };
+
+  const handleInsertBoard = async (
+    updateBoardNo,
+    boardContent,
+    boardImage,
+    mapUrl
+  ) => {
+    console.log(
+      "boardNo:",
+      updateBoardNo,
+      "boardContent:",
+      boardContent,
+      "boardImage:",
+      boardImage,
+      "mapUrl:",
+      mapUrl
+    );
+    if (!boardContent || boardContent.trim === "") {
+      alert("내용을 입력해주세요.");
+      return;
+    } else if (boardImage.length > 10 || boardImage.length < 2) {
+      alert("이미지는 2장 이상 넣어주세요.");
+      return;
+    } else if (boardContent.length < 5 || boardContent.length > 200) {
+      alert("내용은 5자 이상 200자 이하로 입력해주세요.");
+      return;
+    } else if (mapUrl === "") {
+      alert("드라이브 루트를 선택해주세요.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("boardContent", boardContent);
+    formData.append("boardWriter", auth.user.memberNo);
+    boardImage.forEach((boardFiles) => {
+      formData.append("boardFiles", boardFiles);
+    });
+    if (mapUrl) {
+      const response = await fetch(mapUrl);
+      const blob = await response.blob();
+      const drFile = new File([blob], "driveRoute.png", { type: blob.type });
+      formData.append("drFile", drFile);
+    }
+
+    axios
+      .post(`${apiUrl}/driveRouteBoard/insert`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${auth.user.accessToken}`,
+        },
+      })
+      .then((result) => {
+        setOpenRouteModal(false);
+        setBoardContent("");
+        setBoardImage([]);
+        setImagesUrl([]);
+        setMapUrl("");
+        setSrcMap("");
+        alert("게시물이 등록되었습니다.");
+        axios
+          .get(`${apiUrl}/driveRouteBoard/1`, {
+            headers: {
+              Authorization: `Bearer ${auth.user.accessToken}`,
+            },
+          })
+          .then((res) => {
+            const drBoard = res.data;
+            fetchBoards(1);
+          });
+      });
+  };
+
+  const handleUpdateBoard = async (
+    updateBoardNo,
+    boardContent,
+    boardImage,
+    mapUrl
+  ) => {
+    console.log(
+      "boardNo:",
+      updateBoardNo,
+      "boardContent:",
+      boardContent,
+      "boardImage:",
+      boardImage,
+      "mapUrl:",
+      mapUrl
+    );
+    if (!boardContent || boardContent.trim === "") {
+      alert("내용을 입력해주세요.");
+      return;
+    } else if (boardContent.length < 5 || boardContent.length > 200) {
+      alert("내용은 5자 이상 200자 이하로 입력해주세요.");
+      return;
+    } else if (mapUrl === "") {
+      alert("드라이브 루트를 선택해주세요.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("boardContent", boardContent);
+    formData.append("boardWriter", auth.user.memberNo);
+    formData.append("boardNo", updateBoardNo);
+    boardImage.forEach((boardFiles) => {
+      formData.append("boardFiles", boardFiles);
+    });
+    if (mapUrl) {
+      const response = await fetch(mapUrl);
+      const blob = await response.blob();
+      const drFile = new File([blob], "driveRoute.png", { type: blob.type });
+      formData.append("drFile", drFile);
+    }
+
+    axios
+      .post(`${apiUrl}/driveRouteBoard/update`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${auth.user.accessToken}`,
+        },
+      })
+      .then((result) => {
+        setOpenRouteModal(false);
+        setBoardContent("");
+        setBoardImage([]);
+        setImagesUrl([]);
+        setMapUrl("");
+        setSrcMap("");
+        alert("게시물이 수정되었습니다.");
+        axios
+          .get(`${apiUrl}/driveRouteBoard/1`, {
+            headers: {
+              Authorization: `Bearer ${auth.user.accessToken}`,
+            },
+          })
+          .then((res) => {
+            const drBoard = res.data;
+            fetchBoards(1);
+          });
+      });
+  };
 
   return (
     <>
@@ -278,30 +443,6 @@ const BoardModal = ({
             <ModalHeader>드라이브 경로 선택</ModalHeader>
 
             <DriveRouteMap mapUrl={(url) => setMapUrl(url)} />
-          </ModalLabel>
-        </ModalWrapper>
-      )}
-
-      {/* 드라이브 경로 이미지 */}
-      {openDriveRoute && (
-        <ModalWrapper>
-          <CloseBtn onClick={() => setOpenDriveRoute(false)}>
-            <CloseRoundedIcon style={{ fontSize: "40px" }} />
-          </CloseBtn>
-          <ModalLabel>
-            <ModalHeader>드라이브 경로</ModalHeader>
-            <ModalDriveRoute>
-              <ModalDriveRouteImg
-                src={srcMap}
-                alt="드라이브 경로"
-                style={{
-                  width: "100%",
-                  maxHeight: "630px",
-                  objectFit: "cover",
-                  backgroundRepeat: "none",
-                }}
-              />
-            </ModalDriveRoute>
           </ModalLabel>
         </ModalWrapper>
       )}

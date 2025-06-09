@@ -90,7 +90,7 @@ const DRBoard = () => {
   const [commentInfo, setCommentInfo] = useState([]);
   const [hasMoreComment, setHasMoreComment] = useState(true);
   const [hasMore, setHasMore] = useState(true);
-  const [srcMap, setSrcMap] = useState("");
+
   const [commentTargetBoard, setCommentTargetBoard] = useState(null);
   const [comment, setComment] = useState({
     boardNo: null,
@@ -111,177 +111,6 @@ const DRBoard = () => {
     swipe: false,
     nextArrow: <CustomNext />,
     prevArrow: <CustomPrev />,
-  };
-
-  useEffect(() => {
-    if (mapUrl !== "") {
-      setOpenMapModal(false);
-    }
-  }, [mapUrl]);
-
-  const fileHandler = () => {
-    if (ref.current) {
-      ref.current.value = null;
-      ref.current.click();
-    }
-  };
-
-  const handleImageChange = (e) => {
-    const images = e.target.files;
-    let imagesUrlList = [...imagesUrl]; // imagesUrl배열을 펼쳐서 [] 안에 집어넣음
-    let imageLength = images.length > 10 ? 10 : images.length;
-
-    for (let i = 0; i < imageLength; i++) {
-      setBoardImage((prev) => [...prev, images[i]]);
-      const currentImageUrl = URL.createObjectURL(images[i]);
-      imagesUrlList.push(currentImageUrl);
-    }
-    setImagesUrl(imagesUrlList);
-    console.log(imagesUrlList);
-  };
-
-  const handleContentValue = (e) => {
-    setBoardContent(e.target.value);
-  };
-
-  const handleInsertBoard = async (
-    updateBoardNo,
-    boardContent,
-    boardImage,
-    mapUrl
-  ) => {
-    console.log(
-      "boardNo:",
-      updateBoardNo,
-      "boardContent:",
-      boardContent,
-      "boardImage:",
-      boardImage,
-      "mapUrl:",
-      mapUrl
-    );
-    if (!boardContent || boardContent.trim === "") {
-      alert("내용을 입력해주세요.");
-      return;
-    } else if (boardImage.length > 10 || boardImage.length < 2) {
-      alert("이미지는 2장 이상 넣어주세요.");
-      return;
-    } else if (boardContent.length < 5 || boardContent.length > 200) {
-      alert("내용은 5자 이상 200자 이하로 입력해주세요.");
-      return;
-    } else if (mapUrl === "") {
-      alert("드라이브 루트를 선택해주세요.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("boardContent", boardContent);
-    formData.append("boardWriter", auth.user.memberNo);
-    boardImage.forEach((boardFiles) => {
-      formData.append("boardFiles", boardFiles);
-    });
-    if (mapUrl) {
-      const response = await fetch(mapUrl);
-      const blob = await response.blob();
-      const drFile = new File([blob], "driveRoute.png", { type: blob.type });
-      formData.append("drFile", drFile);
-    }
-
-    axios
-      .post(`${apiUrl}/driveRouteBoard/insert`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${auth.user.accessToken}`,
-        },
-      })
-      .then((result) => {
-        setOpenRouteModal(false);
-        setBoardContent("");
-        setBoardImage([]);
-        setImagesUrl([]);
-        setMapUrl("");
-        setSrcMap("");
-        alert("게시물이 등록되었습니다.");
-        axios
-          .get(`${apiUrl}/driveRouteBoard/1`, {
-            headers: {
-              Authorization: `Bearer ${auth.user.accessToken}`,
-            },
-          })
-          .then((res) => {
-            const drBoard = res.data;
-            fetchBoards(1);
-          });
-      });
-  };
-
-  const handleUpdateBoard = async (
-    updateBoardNo,
-    boardContent,
-    boardImage,
-    mapUrl
-  ) => {
-    console.log(
-      "boardNo:",
-      updateBoardNo,
-      "boardContent:",
-      boardContent,
-      "boardImage:",
-      boardImage,
-      "mapUrl:",
-      mapUrl
-    );
-    if (!boardContent || boardContent.trim === "") {
-      alert("내용을 입력해주세요.");
-      return;
-    } else if (boardContent.length < 5 || boardContent.length > 200) {
-      alert("내용은 5자 이상 200자 이하로 입력해주세요.");
-      return;
-    } else if (mapUrl === "") {
-      alert("드라이브 루트를 선택해주세요.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("boardContent", boardContent);
-    formData.append("boardWriter", auth.user.memberNo);
-    formData.append("boardNo", updateBoardNo);
-    boardImage.forEach((boardFiles) => {
-      formData.append("boardFiles", boardFiles);
-    });
-    if (mapUrl) {
-      const response = await fetch(mapUrl);
-      const blob = await response.blob();
-      const drFile = new File([blob], "driveRoute.png", { type: blob.type });
-      formData.append("drFile", drFile);
-    }
-
-    axios
-      .post(`${apiUrl}/driveRouteBoard/update`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${auth.user.accessToken}`,
-        },
-      })
-      .then((result) => {
-        setOpenRouteModal(false);
-        setBoardContent("");
-        setBoardImage([]);
-        setImagesUrl([]);
-        setMapUrl("");
-        setSrcMap("");
-        alert("게시물이 수정되었습니다.");
-        axios
-          .get(`${apiUrl}/driveRouteBoard/1`, {
-            headers: {
-              Authorization: `Bearer ${auth.user.accessToken}`,
-            },
-          })
-          .then((res) => {
-            const drBoard = res.data;
-            fetchBoards(1);
-          });
-      });
   };
 
   useEffect(() => {
@@ -319,38 +148,6 @@ const DRBoard = () => {
 
   const clickToMore = () => {
     setCurrentPage((currentPage) => currentPage + 1);
-  };
-
-  const handleDriveRoute = (e) => {
-    setOpenDriveRoute(true);
-    setSrcMap(e.driveRouteImage);
-  };
-
-  const handleUpdateBtn = (board) => {
-    setBoardContent(board.boardContent);
-    setMapUrl(board.driveRouteImage.driveRouteImage); // 드라이브 경로 이미지
-    setImagesUrl(
-      board.drBoardImage.map((image) => image.boardImage) // URL만 추출
-    );
-    setUpdateBoardNo(board.boardNo);
-    setIsInsertMode(false);
-    setopenPhotoModal(true); // 모달 열기
-  };
-
-  const fetchBoards = (page = 1) => {
-    axios
-      .get(`${apiUrl}/driveRouteBoard/${page}`, {
-        headers: {
-          Authorization: `Bearer ${auth.user.accessToken}`,
-        },
-      })
-      .then((res) => {
-        setBoards(res.data.data.drBoard);
-        setCurrentPage(page); // 페이지까지 업데이트
-      })
-      .catch((error) => {
-        console.error("게시물 조회 실패", error);
-      });
   };
 
   // ----------------------댓글 조회----------------------
@@ -596,10 +393,6 @@ const DRBoard = () => {
   return (
     <>
       <RentContainerDiv>
-        {!openPhotoModal &&
-          !openCommentModal &&
-          !openRouteModal &&
-          !openDriveRoute && <DriveRouteBoardNav />}
         <RentBodyDiv>
           <H1>일상 공유 게시판</H1>
 
@@ -627,15 +420,15 @@ const DRBoard = () => {
             boards={boards}
             setBoardLikesInfo={setBoardLikesInfo}
             boardLikesInfo={boardLikesInfo}
-            expandedPost={expandedPost}
             auth={auth}
             settings={settings}
-            handleUpdateBtn={handleUpdateBtn}
-            handleDelete={handleDelete}
             handleCommentList={handleCommentList}
-            handleDriveRoute={handleDriveRoute}
             handleLikeCancelBtn={handleLikeCancelBtn}
             handleLikeBtn={handleLikeBtn}
+            openPhotoModal={openPhotoModal}
+            setopenPhotoModal={setopenPhotoModal}
+            isInsertMode={isInsertMode}
+            setIsInsertMode={setIsInsertMode}
           />
           {hasMore && (
             <MoreButtonWrapper>
@@ -645,35 +438,6 @@ const DRBoard = () => {
               </StyledMoreButton>
             </MoreButtonWrapper>
           )}
-
-          <BoardModal
-            updateBoardNo={updateBoardNo}
-            boardImage={boardImage}
-            openPhotoModal={openPhotoModal}
-            setOpenPhotoModal={setopenPhotoModal}
-            openRouteModal={openRouteModal}
-            setOpenRouteModal={setOpenRouteModal}
-            openMapModal={openMapModal}
-            setOpenMapModal={setOpenMapModal}
-            openDriveRoute={openDriveRoute}
-            setOpenDriveRoute={setOpenDriveRoute}
-            imagesUrl={imagesUrl}
-            setImagesUrl={setImagesUrl}
-            mapUrl={mapUrl}
-            setMapUrl={setMapUrl}
-            boardContent={boardContent}
-            setBoardContent={setBoardContent}
-            isInsertMode={isInsertMode}
-            setIsInsertMode={setIsInsertMode}
-            auth={auth}
-            settings={settings}
-            handleUpdateBoard={handleUpdateBoard}
-            handleInsertBoard={handleInsertBoard}
-            handleContentValue={handleContentValue}
-            handleImageChange={handleImageChange}
-            fileHandler={fileHandler}
-            ref={ref}
-          />
 
           <SelectComment
             openCommentModal={openCommentModal}

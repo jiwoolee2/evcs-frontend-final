@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useState } from "react";
 import axios from "axios";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
@@ -20,6 +21,7 @@ import {
 } from "../DRBoard.styles";
 import { CustomNext, CustomPrev } from "../../CustomSlides/CustomSlides";
 import Slider from "react-slick";
+import BoardModal from "./BoardModal";
 
 const SelectBoard = ({
   boards,
@@ -28,15 +30,60 @@ const SelectBoard = ({
   auth,
   boardLikesInfo,
   setBoardLikesInfo,
-  expandedPost,
   settings,
-  handleUpdateBtn,
   handleCommentList,
-  handleDriveRoute,
   handleLikeCancelBtn,
   handleLikeBtn,
+  openPhotoModal,
+  setopenPhotoModal,
+  isInsertMode,
+  setIsInsertMode,
 }) => {
   console.log("boards", boards);
+
+  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+
+  // 게시글 수정 시 내용 저장할 state
+  const [boardContent, setBoardContent] = useState("");
+  const [mapUrl, setMapUrl] = useState("");
+  const [imagesUrl, setImagesUrl] = useState([]);
+  const [boardImage, setBoardImage] = useState([]); // 파일자체를 저장
+  const [updateBoardNo, setUpdateBoardNo] = useState(null);
+
+  // 지도표시 모달
+  const [srcMap, setSrcMap] = useState("");
+  // 게시글 수정/작성 모달
+  const [openDriveRoute, setOpenDriveRoute] = useState(false);
+  const [openMapModal, setOpenMapModal] = useState(false);
+  const [openRouteModal, setOpenRouteModal] = useState(false);
+
+  const [driveRouteImage, setDriveRouteImage] = useState(null);
+  const [expandedPost, setExpandedPost] = useState({});
+  const ref = useRef();
+
+  const handleContentValue = (e) => {
+    setBoardContent(e.target.value);
+  };
+
+  const handleDriveRoute = (board) => {
+    setOpenDriveRoute(true);
+    setSrcMap(board.driveRouteImage.driveRouteImage);
+  };
+
+  const handleUpdateBtn = (board) => {
+    getBoardInfo(board);
+    setIsInsertMode(false);
+    setopenPhotoModal(true); // 모달 열기
+  };
+
+  const getBoardInfo = (board) => {
+    setBoardContent(board.boardContent);
+    setMapUrl(board.driveRouteImage.driveRouteImage); // 드라이브 경로 이미지
+    setImagesUrl(
+      board.drBoardImage.map((image) => image.boardImage) // URL만 추출
+    );
+    setUpdateBoardNo(board.boardNo);
+  };
 
   const handleDelete = (boardNo) => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
@@ -56,6 +103,23 @@ const SelectBoard = ({
         });
     }
   };
+
+  const fetchBoards = (page = 1) => {
+    axios
+      .get(`${apiUrl}/driveRouteBoard/${page}`, {
+        headers: {
+          Authorization: `Bearer ${auth.user.accessToken}`,
+        },
+      })
+      .then((res) => {
+        setBoards(res.data.data.drBoard);
+        setCurrentPage(page); // 페이지까지 업데이트
+      })
+      .catch((error) => {
+        console.error("게시물 조회 실패", error);
+      });
+  };
+
   return (
     <>
       <Wrapper>
@@ -156,6 +220,57 @@ const SelectBoard = ({
           </ContentBox>
         ))}
       </Wrapper>
+
+      <BoardModal
+        // 게시글 수정 시 내용 저장할 state
+        boardContent={boardContent}
+        mapUrl={mapUrl}
+        imagesUrl={imagesUrl}
+        boardImage={boardImage}
+        isInsertMode={isInsertMode}
+        updateBoardNo={updateBoardNo}
+        setBoardContent={setBoardContent}
+        setMapUrl={setMapUrl}
+        setImagesUrl={setImagesUrl}
+        setIsInsertMode={setIsInsertMode}
+        // 게시글 수정/작성 모달
+        openPhotoModal={openPhotoModal}
+        setOpenPhotoModal={setopenPhotoModal}
+        openRouteModal={openRouteModal}
+        setOpenRouteModal={setOpenRouteModal}
+        openMapModal={openMapModal}
+        setOpenMapModal={setOpenMapModal}
+        openDriveRoute={openDriveRoute}
+        setOpenDriveRoute={setOpenDriveRoute}
+        auth={auth}
+        settings={settings}
+        handleContentValue={handleContentValue}
+        ref={ref}
+      />
+
+      {/* 드라이브 경로 이미지 */}
+      {openDriveRoute && (
+        <ModalWrapper>
+          <CloseBtn onClick={() => setOpenDriveRoute(false)}>
+            <CloseRoundedIcon style={{ fontSize: "40px" }} />
+          </CloseBtn>
+          <ModalLabel>
+            <ModalHeader>드라이브 경로</ModalHeader>
+            <ModalDriveRoute>
+              <ModalDriveRouteImg
+                src={srcMap}
+                alt="드라이브 경로"
+                style={{
+                  width: "100%",
+                  maxHeight: "630px",
+                  objectFit: "cover",
+                  backgroundRepeat: "none",
+                }}
+              />
+            </ModalDriveRoute>
+          </ModalLabel>
+        </ModalWrapper>
+      )}
     </>
   );
 };
