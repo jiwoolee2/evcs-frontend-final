@@ -402,22 +402,14 @@ const DRBoard = () => {
           <H3>당신의 일상과 드라이브 루트를 공유해보세요~</H3>
 
           <br />
-          <InsertButton
-            onClick={() => {
-              setopenPhotoModal(true), setIsInsertMode(true);
-            }}
-          >
-            <AddBoxOutlinedIcon /> 게시물 만들기
-          </InsertButton>
-          <br />
 
           <SelectBoard
             currentPage={currentPage}
+            boards={boards}
             setBoards={setBoards}
             apiUrl={apiUrl}
             setHasMore={setHasMore}
             setCurrentPage={setCurrentPage}
-            boards={boards}
             setBoardLikesInfo={setBoardLikesInfo}
             boardLikesInfo={boardLikesInfo}
             auth={auth}
@@ -425,10 +417,6 @@ const DRBoard = () => {
             handleCommentList={handleCommentList}
             handleLikeCancelBtn={handleLikeCancelBtn}
             handleLikeBtn={handleLikeBtn}
-            openPhotoModal={openPhotoModal}
-            setopenPhotoModal={setopenPhotoModal}
-            isInsertMode={isInsertMode}
-            setIsInsertMode={setIsInsertMode}
           />
           {hasMore && (
             <MoreButtonWrapper>

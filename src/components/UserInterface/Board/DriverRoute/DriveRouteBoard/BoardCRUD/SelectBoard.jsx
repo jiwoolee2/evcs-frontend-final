@@ -5,6 +5,8 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import ChatIcon from "@mui/icons-material/Chat";
 import DriveEtaTwoToneIcon from "@mui/icons-material/DriveEtaTwoTone";
+import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import {
   Wrapper,
   ContentBox,
@@ -18,8 +20,14 @@ import {
   TopBar,
   UpdateButton,
   DeleteButton,
+  InsertButton,
+  ModalWrapper,
+  ModalLabel,
+  ModalHeader,
+  ModalDriveRoute,
+  ModalDriveRouteImg,
+  CloseBtn,
 } from "../DRBoard.styles";
-import { CustomNext, CustomPrev } from "../../CustomSlides/CustomSlides";
 import Slider from "react-slick";
 import BoardModal from "./BoardModal";
 
@@ -34,36 +42,26 @@ const SelectBoard = ({
   handleCommentList,
   handleLikeCancelBtn,
   handleLikeBtn,
-  openPhotoModal,
-  setopenPhotoModal,
-  isInsertMode,
-  setIsInsertMode,
+  apiUrl,
 }) => {
   console.log("boards", boards);
-
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
 
   // 게시글 수정 시 내용 저장할 state
   const [boardContent, setBoardContent] = useState("");
   const [mapUrl, setMapUrl] = useState("");
   const [imagesUrl, setImagesUrl] = useState([]);
-  const [boardImage, setBoardImage] = useState([]); // 파일자체를 저장
+
   const [updateBoardNo, setUpdateBoardNo] = useState(null);
+  const [isInsertMode, setIsInsertMode] = useState(true);
+  const [openPhotoModal, setopenPhotoModal] = useState(false);
 
   // 지도표시 모달
   const [srcMap, setSrcMap] = useState("");
-  // 게시글 수정/작성 모달
   const [openDriveRoute, setOpenDriveRoute] = useState(false);
-  const [openMapModal, setOpenMapModal] = useState(false);
-  const [openRouteModal, setOpenRouteModal] = useState(false);
+  // 게시글 수정/작성 모달
 
-  const [driveRouteImage, setDriveRouteImage] = useState(null);
   const [expandedPost, setExpandedPost] = useState({});
   const ref = useRef();
-
-  const handleContentValue = (e) => {
-    setBoardContent(e.target.value);
-  };
 
   const handleDriveRoute = (board) => {
     setOpenDriveRoute(true);
@@ -122,6 +120,15 @@ const SelectBoard = ({
 
   return (
     <>
+      <InsertButton
+        onClick={() => {
+          setopenPhotoModal(true), setIsInsertMode(true);
+        }}
+      >
+        <AddBoxOutlinedIcon /> 게시물 만들기
+      </InsertButton>
+      <br />
+
       <Wrapper>
         {boards.map((board, i) => (
           <ContentBox key={i}>
@@ -226,7 +233,6 @@ const SelectBoard = ({
         boardContent={boardContent}
         mapUrl={mapUrl}
         imagesUrl={imagesUrl}
-        boardImage={boardImage}
         isInsertMode={isInsertMode}
         updateBoardNo={updateBoardNo}
         setBoardContent={setBoardContent}
@@ -236,22 +242,21 @@ const SelectBoard = ({
         // 게시글 수정/작성 모달
         openPhotoModal={openPhotoModal}
         setOpenPhotoModal={setopenPhotoModal}
-        openRouteModal={openRouteModal}
-        setOpenRouteModal={setOpenRouteModal}
-        openMapModal={openMapModal}
-        setOpenMapModal={setOpenMapModal}
-        openDriveRoute={openDriveRoute}
-        setOpenDriveRoute={setOpenDriveRoute}
         auth={auth}
         settings={settings}
-        handleContentValue={handleContentValue}
         ref={ref}
+        fetchBoards={fetchBoards}
       />
 
       {/* 드라이브 경로 이미지 */}
       {openDriveRoute && (
         <ModalWrapper>
-          <CloseBtn onClick={() => setOpenDriveRoute(false)}>
+          <CloseBtn
+            onClick={() => {
+              setOpenDriveRoute(false);
+              setSrcMap("");
+            }}
+          >
             <CloseRoundedIcon style={{ fontSize: "40px" }} />
           </CloseBtn>
           <ModalLabel>

@@ -6,6 +6,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import AutoAwesomeMotionOutlinedIcon from "@mui/icons-material/AutoAwesomeMotionOutlined";
 import DriveRouteMap from "../../DriveRouteMap/DriveRouteMap";
 import axios from "axios";
+import { useState } from "react";
 import {
   ModalWrapper,
   ModalLabel,
@@ -28,14 +29,6 @@ const BoardModal = ({
   updateBoardNo,
   openPhotoModal,
   setOpenPhotoModal,
-  openRouteModal,
-  setOpenRouteModal,
-  openMapModal,
-  setOpenMapModal,
-  openDriveRoute,
-  setOpenDriveRoute,
-  boardImage,
-  setBoardImage,
   imagesUrl,
   setImagesUrl,
   mapUrl,
@@ -46,11 +39,14 @@ const BoardModal = ({
   setIsInsertMode,
   auth,
   settings,
-  handleContentValue,
   ref,
+  fetchBoards,
 }) => {
   const apiUrl = window.ENV?.API_URL || "http://localhost:80";
-
+  const [openMapModal, setOpenMapModal] = useState(false);
+  const [openRouteModal, setOpenRouteModal] = useState(false);
+  const [driveRouteImage, setDriveRouteImage] = useState(null);
+  const [boardImage, setBoardImage] = useState([]); // 파일자체를 저장
   useEffect(() => {
     if (mapUrl !== "") {
       setOpenMapModal(false);
@@ -69,6 +65,8 @@ const BoardModal = ({
     let imagesUrlList = [...imagesUrl]; // imagesUrl배열을 펼쳐서 [] 안에 집어넣음
     let imageLength = images.length > 10 ? 10 : images.length;
 
+    // imagesUrList에 새로선택한 이미지들을 url로 바꾼 후 추가해서 ImageUrl state에 저장
+    // 그 전에 이미지 그 자체를 boardImage state에 저장
     for (let i = 0; i < imageLength; i++) {
       setBoardImage((prev) => [...prev, images[i]]);
       const currentImageUrl = URL.createObjectURL(images[i]);
@@ -78,15 +76,12 @@ const BoardModal = ({
     console.log(imagesUrlList);
   };
 
-  const handleInsertBoard = async (
-    updateBoardNo,
-    boardContent,
-    boardImage,
-    mapUrl
-  ) => {
+  const handleContentValue = (e) => {
+    setBoardContent(e.target.value);
+  };
+
+  const handleInsertBoard = async (boardContent, boardImage, mapUrl) => {
     console.log(
-      "boardNo:",
-      updateBoardNo,
       "boardContent:",
       boardContent,
       "boardImage:",
@@ -134,18 +129,8 @@ const BoardModal = ({
         setBoardImage([]);
         setImagesUrl([]);
         setMapUrl("");
-        setSrcMap("");
         alert("게시물이 등록되었습니다.");
-        axios
-          .get(`${apiUrl}/driveRouteBoard/1`, {
-            headers: {
-              Authorization: `Bearer ${auth.user.accessToken}`,
-            },
-          })
-          .then((res) => {
-            const drBoard = res.data;
-            fetchBoards(1);
-          });
+        fetchBoards(1);
       });
   };
 
@@ -203,18 +188,8 @@ const BoardModal = ({
         setBoardImage([]);
         setImagesUrl([]);
         setMapUrl("");
-        setSrcMap("");
         alert("게시물이 수정되었습니다.");
-        axios
-          .get(`${apiUrl}/driveRouteBoard/1`, {
-            headers: {
-              Authorization: `Bearer ${auth.user.accessToken}`,
-            },
-          })
-          .then((res) => {
-            const drBoard = res.data;
-            fetchBoards(1);
-          });
+        fetchBoards(1);
       });
   };
 
@@ -329,7 +304,7 @@ const BoardModal = ({
                       padding: "5px",
                       cursor: "pointer",
                     }}
-                    onClick={() => fileHandler}
+                    onClick={fileHandler}
                   />
                 </>
               )}
@@ -358,12 +333,7 @@ const BoardModal = ({
                   새 게시물 만들기
                   <ModalSubmit
                     onClick={() =>
-                      handleInsertBoard(
-                        updateBoardNo,
-                        boardContent,
-                        boardImage,
-                        mapUrl
-                      )
+                      handleInsertBoard(boardContent, boardImage, mapUrl)
                     }
                   >
                     공유하기
