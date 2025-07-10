@@ -22,23 +22,6 @@ const Map = styled.div`
   z-index: 1;
 `;
 
-const pad = (n) => (n < 10 ? "0" + n : n);
-const formatDateToLocalDateTime = (date) => {
-  return (
-    date.getFullYear() +
-    "-" +
-    pad(date.getMonth() + 1) +
-    "-" +
-    pad(date.getDate()) +
-    "T" +
-    pad(date.getHours()) +
-    ":" +
-    pad(date.getMinutes()) +
-    ":" +
-    pad(date.getSeconds())
-  );
-};
-
 const CarMap = () => {
   const apiUrl = window.ENV?.API_URL || "http://localhost:80";
   const location = useLocation();
@@ -60,6 +43,23 @@ const CarMap = () => {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   const totalHoursDecimal = totalMinutes / 60;
+  const pad = (n) => (n < 10 ? "0" + n : n);
+  const formatDateToLocalDateTime = (date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getDate()) +
+      "T" +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes()) +
+      ":" +
+      pad(date.getSeconds())
+    );
+  };
+
   useEffect(() => {
     window.kakao.maps.load(() => {
       setLoaded(true);
@@ -67,13 +67,15 @@ const CarMap = () => {
   }, []);
 
   useEffect(() => {
+    if (!loaded) return;
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         setCurrentPosition(new window.kakao.maps.LatLng(latitude, longitude));
       });
     }
-  }, []);
+  }, [loaded]);
 
   useEffect(() => {
     // 시간별 렌트카 정보를 조회해옴
@@ -136,7 +138,7 @@ const CarMap = () => {
 
     const mapContainer = document.getElementById("map");
     if (!mapContainer) {
-      console.warn("❗ mapContainer가 null입니다.");
+      console.warn("mapContainer가 null입니다.");
       return;
     }
     const mapOption = {
