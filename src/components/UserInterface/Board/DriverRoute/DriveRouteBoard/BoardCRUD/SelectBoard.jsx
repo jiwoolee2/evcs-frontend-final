@@ -222,7 +222,7 @@ const SelectBoard = ({
         console.log(error);
       });
   };
-
+  console.log("boards 구조 확인", boards);
   return (
     <>
       <InsertButton
@@ -235,8 +235,8 @@ const SelectBoard = ({
       <br />
 
       <Wrapper>
-        {boards.map((board, i) => (
-          <ContentBox key={i}>
+        {boards.map((board) => (
+          <ContentBox key={board.boardNo}>
             <TopBar>
               <NickName>{board.memberNickName} 님의 게시글</NickName>
               {board.boardWriter == auth.user.memberNo && (
@@ -256,7 +256,7 @@ const SelectBoard = ({
                 style={{ width: "100%", height: "100%" }}
               >
                 <Slider {...settings}>
-                  {board.drBoardImage.map((item, index) => (
+                  {board.drBoardImage?.map((item, index) => (
                     <div key={index}>
                       <img
                         src={item.boardImage}
@@ -301,6 +301,7 @@ const SelectBoard = ({
                 드라이브 경로
               </DriveRouteIcon>
             </PostIcon>
+
             {board.likesCount > 0 && (
               <span
                 style={{

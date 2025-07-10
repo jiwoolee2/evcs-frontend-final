@@ -42,7 +42,7 @@ const DRBoard = () => {
       .get(`${apiUrl}/driveRouteBoard/${currentPage}`)
       .then((result) => {
         console.log("게시물 조회 결과:", result);
-        const drBoard = result.data.drBoard ?? [];
+        const drBoard = result.data.data.drBoard ?? [];
         if (currentPage === 1) {
           setBoards([...drBoard]);
         }
