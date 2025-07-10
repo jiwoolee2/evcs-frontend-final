@@ -6,21 +6,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Button, Image } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../../Context/AuthContext/AuthContext";
-import { H1, H3, RentBodyDiv, RentContainerDiv } from "./CarMap.styles";
+import { H1, H3, RentBodyDiv, RentContainerDiv, Map } from "./CarMap.styles";
 import { useNavigate, useLocation } from "react-router-dom";
 import RentCarNav from "../../Common/Nav/RentCarNav";
 import { PaymentButton } from "../LongTermRentCar/PaymentButton";
 import { InlineBadge } from "../RentCarCommon/RentCarCard.styles";
-
-const Map = styled.div`
-  width: 1200px;
-  height: 700px;
-  margin: 50px auto;
-  border: 2px solid black;
-  border-radius: 1em;
-  position: relative;
-  z-index: 1;
-`;
 
 const CarMap = () => {
   const apiUrl = window.ENV?.API_URL || "http://localhost:80";
@@ -61,6 +51,7 @@ const CarMap = () => {
   };
 
   useEffect(() => {
+    if (!window.kakao || !window.kakao.maps) return;
     window.kakao.maps.load(() => {
       setLoaded(true);
     });
@@ -99,7 +90,7 @@ const CarMap = () => {
   }, []);
 
   useEffect(() => {
-    if (enrollPlace.length === 0) return;
+    if (!loaded || enrollPlace.length === 0) return;
 
     const geocoder = new window.kakao.maps.services.Geocoder();
 
@@ -128,7 +119,7 @@ const CarMap = () => {
       }
     };
     fetchAllCoords();
-  }, [enrollPlace]);
+  }, [loaded, enrollPlace]);
 
   console.log("enrollPosition", enrollPosition);
   console.log("timeRentCarResult", timeRentCarResult);
@@ -274,10 +265,7 @@ const CarMap = () => {
   }, [loaded, enrollPosition, timeRentCarResult, currentPosition]);
 
   const handlePayment = () => {
-    // 결제 로직을 여기에 추가합니다.
-    // 예를 들어, 결제 API를 호출하거나 결제 모달을 띄우는 등의 작업을 수행할 수 있습니다.
     console.log("결제하기 버튼 클릭됨");
-
     axios
       .post(`${apiUrl}/reservation/insert`, {
         memberNo: memberNo,
@@ -306,6 +294,7 @@ const CarMap = () => {
           <br />
           <br />
           <H3>대여위치 및 차량 설정</H3>
+
           <div
             style={{
               position: "absolute",
