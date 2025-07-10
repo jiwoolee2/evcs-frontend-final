@@ -10,6 +10,16 @@ export const DetailDiv = styled.div`
   margin-top: 30px;
 `;
 
+export const Map = styled.div`
+  width: 1200px;
+  height: 700px;
+  margin: 50px auto;
+  border: 2px solid black;
+  border-radius: 1em;
+  position: relative;
+  z-index: 1;
+`;
+
 export const ContainerDiv = styled.div`
   display: flex;
   height: 100%;
