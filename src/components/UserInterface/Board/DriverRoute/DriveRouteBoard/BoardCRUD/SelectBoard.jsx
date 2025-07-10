@@ -30,6 +30,7 @@ import {
 } from "../DRBoard.styles";
 import Slider from "react-slick";
 import BoardModal from "./BoardModal";
+import SelectComment from "../CommentCRUD/SelectComment";
 
 const SelectBoard = ({
   boards,
@@ -39,9 +40,6 @@ const SelectBoard = ({
   boardLikesInfo,
   setBoardLikesInfo,
   settings,
-  handleCommentList,
-  handleLikeCancelBtn,
-  handleLikeBtn,
   apiUrl,
 }) => {
   console.log("boards", boards);
@@ -62,6 +60,10 @@ const SelectBoard = ({
 
   const [expandedPost, setExpandedPost] = useState({});
   const ref = useRef();
+
+  // 댓글
+  const [commentTargetBoard, setCommentTargetBoard] = useState(null);
+  const [openCommentModal, setOpenCommentModal] = useState(false);
 
   const handleDriveRoute = (board) => {
     setOpenDriveRoute(true);
@@ -115,6 +117,109 @@ const SelectBoard = ({
       })
       .catch((error) => {
         console.error("게시물 조회 실패", error);
+      });
+  };
+
+  // ----------------------댓글 조회----------------------
+  const handleCommentList = (board) => {
+    setImagesUrl(board.drBoardImage.map((image) => image.boardImage));
+    setCommentTargetBoard({
+      memberNickName: board.memberNickName,
+      memberNo: board.memberNo,
+      boardNo: board.boardNo,
+      boardContent: board.boardContent,
+    });
+    setOpenCommentModal(true);
+  };
+
+  useEffect(() => {
+    axios
+      .get(`${apiUrl}/driveRouteBoard/selectLikes`, {
+        headers: {
+          Authorization: `Bearer ${auth.user.accessToken}`,
+        },
+      })
+      .then((result) => {
+        console.log("boardLikesInfo :", result.data);
+        setBoardLikesInfo([...result.data]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const handleLikeBtn = (boardNo) => {
+    axios
+      .get(`${apiUrl}/driveRouteBoard/likes/${boardNo}`, {
+        headers: {
+          Authorization: `Bearer ${auth.user.accessToken}`,
+        },
+      })
+      .then(() => {
+        setBoards((prevBoards) =>
+          prevBoards.map((board) =>
+            board.boardNo === boardNo
+              ? { ...board, likeCount: board.likeCount + 1 }
+              : board
+          )
+        );
+        setBoardLikesInfo((prev) => [...prev, { boardNo }]);
+
+        axios
+          .get(`${apiUrl}/driveRouteBoard/selectLikes`, {
+            headers: {
+              Authorization: `Bearer ${auth.user.accessToken}`,
+            },
+          })
+          .then((result) => {
+            console.log("boardLikesInfo :", result.data);
+            setBoardLikesInfo([...result.data]);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const handleLikeCancelBtn = (boardNo) => {
+    axios
+      .delete(`${apiUrl}/driveRouteBoard/likesCancel/${boardNo}`, {
+        headers: {
+          Authorization: `Bearer ${auth.user.accessToken}`,
+        },
+      })
+      .then(() => {
+        setBoards((prevBoards) =>
+          prevBoards.map((board) =>
+            board.boardNo === boardNo
+              ? {
+                  ...board,
+                  likeCount: Math.max(board.likeCount - 1, 0), // 0 미만 방지
+                }
+              : board
+          )
+        );
+        setBoardLikesInfo((prev) =>
+          prev.filter((item) => item.boardNo !== boardNo)
+        );
+        axios
+          .get(`${apiUrl}/driveRouteBoard/selectLikes`, {
+            headers: {
+              Authorization: `Bearer ${auth.user.accessToken}`,
+            },
+          })
+          .then((result) => {
+            console.log("boardLikesInfo :", result.data);
+            setBoardLikesInfo([...result.data]);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -276,6 +381,17 @@ const SelectBoard = ({
           </ModalLabel>
         </ModalWrapper>
       )}
+
+      <SelectComment
+        openCommentModal={openCommentModal}
+        setOpenCommentModal={setOpenCommentModal}
+        commentTargetBoard={commentTargetBoard}
+        imagesUrl={imagesUrl}
+        auth={auth}
+        settings={settings}
+        apiUrl={apiUrl}
+        // 게시물 이미지 정보 전달
+      />
     </>
   );
 };
