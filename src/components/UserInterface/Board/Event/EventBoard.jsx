@@ -136,7 +136,7 @@ const EventBoard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {(events || []).map((event) => (
+                          {/* {(events || []).map((event) => (
                             <tr
                               key={event.eventNo}
                               style={{ cursor: "pointer" }}
@@ -151,7 +151,7 @@ const EventBoard = () => {
                               <td>{event.memberNickname}</td>
                               <td>{event.enrollDate}</td>
                             </tr>
-                          ))}
+                          ))} */}
                         </tbody>
                       </Table>
                     </Card.Body>
