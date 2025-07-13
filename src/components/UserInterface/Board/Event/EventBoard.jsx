@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const EventBoard = () => {
-  const ENV_URL = window.ENV?.API_URL || `http://localhost:2580`;
+  const ENV_URL = window.ENV?.API_URL || `http://localhost:8080`;
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [page, setPage] = useState(1);
@@ -35,7 +35,7 @@ const EventBoard = () => {
       })
       .then((res) => {
         console.log("effect data : ", res.data);
-        setEvents(res.data.eventList);
+        setEvents(res.data.eventList || []);
         setPageInfo(res.data.pageInfo);
       })
       .catch(console.error);
@@ -138,7 +138,7 @@ const EventBoard = () => {
                         <tbody>
                           {events.map((event) => (
                             <tr
-                              key={event.evnetNo}
+                              key={event.eventNo}
                               style={{ cursor: "pointer" }}
                               onClick={() =>
                                 navigate("/goEventDetailPage", {

@@ -23,7 +23,7 @@ const DRBoard = () => {
   const [hasMore, setHasMore] = useState(true);
 
   const [boardLikesInfo, setBoardLikesInfo] = useState([]);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   const settings = {
     dots: true,
     infinite: true,

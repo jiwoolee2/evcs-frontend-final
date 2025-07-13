@@ -17,7 +17,7 @@ function Notice() {
   const [currentPage, setCurrentPage] = useState(pageFromQuery); // 페이지 상태 설정
   const noticesPerPage = 5;
 
-  const backendUrl = window.ENV?.API_URL || `http://localhost:80`;
+  const backendUrl = window.ENV?.API_URL || `http://`;
 
   useEffect(() => {
     axios

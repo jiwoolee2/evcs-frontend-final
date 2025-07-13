@@ -24,7 +24,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);

@@ -29,7 +29,7 @@ function SignUpPage() {
   // 추가 상태
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   // 타이머 설정 (30초로 변경)
   const [resendTimer, setResendTimer] = useState(0);

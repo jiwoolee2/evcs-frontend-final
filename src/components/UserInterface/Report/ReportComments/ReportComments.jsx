@@ -6,7 +6,7 @@ import axios from "axios";
 import MyPageNav from "../../../UserInterface/Common/Nav/MyPageNav";
 
 const ReportComments = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   const navigate = useNavigate();
   const { auth } = useAuth();

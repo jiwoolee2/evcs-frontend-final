@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 
 const AdminReportComDetail = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   const { rpNo } = useParams();
   console.log("rpNo param:", rpNo);

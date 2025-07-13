@@ -9,7 +9,7 @@ import {
 } from "../NewsMain/NewsItemComponents";
 import * as S from "../NewsMain/NewsMain.styles";
 
-const NewsList = ({ backendUrl = "http://localhost:80" }) => {
+const NewsList = ({ backendUrl = "http://localhost:8080" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);

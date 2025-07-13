@@ -8,7 +8,7 @@ import {
 } from "./NewsMain/NewsItemComponents";
 
 const NewsMainList = ({
-  backendUrl = window.ENV?.API_URL || `http://localhost:80`,
+  backendUrl = window.ENV?.API_URL || `http://localhost:8080`,
   query = "전기차",
 }) => {
   const navigate = useNavigate();

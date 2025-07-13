@@ -26,7 +26,7 @@ const InsertCar = () => {
   const carCompany = location.state?.carCompany;
   const carType = location.state?.carType;
   const [imagePreview, setImagePreview] = useState(car?.fileLoad);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   const [form, setForm] = useState({
     carNo: car.carNo,
     carName: car.carName,

@@ -22,7 +22,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { auth, logout } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   const checkAdminRole = useCallback(async () => {
     const token = auth.user?.accessToken;
     if (!token) {

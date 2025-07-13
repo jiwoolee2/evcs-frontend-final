@@ -8,7 +8,7 @@ function NoticeWrite() {
   const [content, setContent] = useState("");
   const navigate = useNavigate();
 
-  const backendUrl = window.ENV?.API_URL || `http://localhost:80`;
+  const backendUrl = window.ENV?.API_URL || `http://`;
 
   const handleSave = () => {
     axios

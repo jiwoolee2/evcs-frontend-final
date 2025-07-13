@@ -13,7 +13,7 @@ function NoticeDetail() {
   const [notice, setNotice] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const backendUrl = window.ENV?.API_URL || `http://localhost:80`;
+  const backendUrl = window.ENV?.API_URL || `http://`;
 
   useEffect(() => {
     axios

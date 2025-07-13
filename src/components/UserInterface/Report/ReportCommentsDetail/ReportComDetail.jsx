@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 
 const ReportComDetail = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   const { rpNo } = useParams();
   const navigate = useNavigate();

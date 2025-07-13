@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -8,6 +8,7 @@ import {
   RentContainerDiv,
   RentBodyDiv,
 } from "../AdminRentCarCommon/AdminRentCar.styles";
+import Pagination from "../../AdminCommon/Pagination/GetPageInfo.jsx";
 
 const RentCarManagement = () => {
   const navigate = useNavigate();
@@ -15,16 +16,14 @@ const RentCarManagement = () => {
   const [category, setCategory] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState();
-  const [totalPages, setTotalPages] = useState();
-  const [startPage, setStartPage] = useState(1);
+  const [pageInfo, setPageInfo] = useState(null);
   const [carInfo, setCarInfo] = useState([]);
   const [rentCarInfo, setRentCarInfo] = useState([]);
   const [useStatus, setUseStatus] = useState("");
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+
   useEffect(() => {
     axios
-      .get(`${apiUrl}/rentCar/${currentPage}`, {
+      .get(`http://localhost/rentCar/${currentPage}`, {
         params: {
           useStatus, // 사용중인지 아닌지
           category, // 카테고리
@@ -35,9 +34,7 @@ const RentCarManagement = () => {
         const res = result.data;
 
         setRentCarInfo(res.rentCarInfo);
-        setStartPage(res.pageInfo.startPage);
-        setPageSize(res.pageInfo.pageSize);
-        setTotalPages(res.pageInfo.totalPages);
+        setPageInfo(res.pageInfo);
 
         const carList = res.carInfo.map((carinformation) => ({
           carNo: carinformation.carNo,
@@ -71,27 +68,21 @@ const RentCarManagement = () => {
         console.log(error);
       });
   }, [currentPage, category, useStatus]);
+
   const handleSearch = () => {
     axios
-      .get(
-        `${apiUrl}/rentCar/${currentPage}`,
-        {
-          params: {
-            useStatus, // 사용중인지 아닌지
-            category, // 카테고리
-            searchKeyword, // 검색어
-          },
+      .get(`http://localhost/rentCar/${currentPage}`, {
+        params: {
+          useStatus, // 사용중인지 아닌지
+          category, // 카테고리
+          searchKeyword, // 검색어
         },
-        [currentPage]
-      )
+      })
       .then((result) => {
         console.log(result.data);
         const res = result.data;
-
+        setPageInfo(res.pageInfo);
         setRentCarInfo(res.rentCarInfo);
-        setStartPage(res.pageInfo.startPage);
-        setPageSize(res.pageInfo.pageSize);
-        setTotalPages(res.pageInfo.totalPages);
 
         const carList = res.carInfo.map((carinformation) => ({
           carNo: carinformation.carNo,
@@ -122,26 +113,6 @@ const RentCarManagement = () => {
         console.log(error);
       });
   };
-
-  const Previous = () => {
-    if (startPage > 5) {
-      setStartPage(startPage - pageSize);
-      setCurrentPage(startPage - pageSize);
-    }
-  };
-
-  const Next = () => {
-    if (startPage + 5 <= totalPages) {
-      setStartPage(startPage + 5);
-      setPage(startPage + 5);
-    }
-  };
-  const pageNumbers = [];
-  for (let i = 0; i < pageSize; i++) {
-    if (startPage + i <= totalPages) {
-      pageNumbers.push(startPage + i);
-    }
-  }
 
   console.log("rentCarList :", rentCarInfo);
   console.log("carInfo :", carInfo);
@@ -208,7 +179,7 @@ const RentCarManagement = () => {
                     variant="dark"
                     onClick={() => navigate("/admin/insertRentCar")} // 등록 페이지로 이동
                   >
-                    등록하기
+                    등록
                   </Button>
                 </Col>
               </Row>
@@ -292,24 +263,13 @@ const RentCarManagement = () => {
                 </tbody>
               </Table>
             </Container>
-            <div style={{ textAlign: "center", marginTop: "30px" }}>
-              <button onClick={Previous}>이전</button>
-
-              {pageNumbers.map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setCurrentPage(num)}
-                  style={{
-                    margin: "0 5px",
-                    fontWeight: currentPage === num ? "bold" : "normal",
-                  }}
-                >
-                  {num}
-                </button>
-              ))}
-
-              <button onClick={Next}>다음</button>
-            </div>
+            {pageInfo && (
+              <Pagination
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                pageInfo={pageInfo}
+              />
+            )}
           </RentBodyDiv>
         </div>
       </RentContainerDiv>
