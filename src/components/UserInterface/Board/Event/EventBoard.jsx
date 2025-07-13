@@ -136,22 +136,23 @@ const EventBoard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {events.map((event) => (
-                            <tr
-                              key={event.eventNo}
-                              style={{ cursor: "pointer" }}
-                              onClick={() =>
-                                navigate("/goEventDetailPage", {
-                                  state: { event: event }, // ← 여기서 객체 넘기기
-                                })
-                              }
-                            >
-                              <td>{event.eventNo}</td>
-                              <td>{event.eventName}</td>
-                              <td>{event.memberNickname}</td>
-                              <td>{event.enrollDate}</td>
-                            </tr>
-                          ))}
+                          {events &&
+                            events.map((event) => (
+                              <tr
+                                key={event.eventNo}
+                                style={{ cursor: "pointer" }}
+                                onClick={() =>
+                                  navigate("/goEventDetailPage", {
+                                    state: { event: event }, // ← 여기서 객체 넘기기
+                                  })
+                                }
+                              >
+                                <td>{event.eventNo}</td>
+                                <td>{event.eventName}</td>
+                                <td>{event.memberNickname}</td>
+                                <td>{event.enrollDate}</td>
+                              </tr>
+                            ))}
                         </tbody>
                       </Table>
                     </Card.Body>
