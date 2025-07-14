@@ -13,7 +13,7 @@ function UserNotice() {
   const [currentPage, setCurrentPage] = useState(1);
   const noticesPerPage = 5;
   const [notices, setNotices] = useState([]);
-  const backendUrl = window.ENV?.API_URL || `http://localhost:80`;
+  const backendUrl = window.ENV?.API_URL || `http://localhost:8080`;
 
   useEffect(() => {
     axios

@@ -55,4 +55,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/deploy
+            rm -f ./front/dist/conf.js
             docker-compose restart web
