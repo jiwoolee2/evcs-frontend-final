@@ -136,23 +136,28 @@ const EventBoard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {events &&
-                            (events || [])?.map((event) => (
-                              <tr
-                                key={event.eventNo}
-                                style={{ cursor: "pointer" }}
-                                onClick={() =>
-                                  navigate("/goEventDetailPage", {
-                                    state: { event: event },
-                                  })
-                                }
-                              >
-                                <td>{event.eventNo}</td>
-                                <td>{event.eventName}</td>
-                                <td>{event.memberNickname}</td>
-                                <td>{event.enrollDate}</td>
-                              </tr>
-                            ))}
+                          {events.length != 0 ? (
+                            (events || [])?.map((event) => {
+                              return (
+                                <tr
+                                  key={event.eventNo}
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    navigate("/goEventDetailPage", {
+                                      state: { event: event },
+                                    })
+                                  }
+                                >
+                                  <td>{event.eventNo}</td>
+                                  <td>{event.eventName}</td>
+                                  <td>{event.memberNickname}</td>
+                                  <td>{event.enrollDate}</td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <div>연두해요</div>
+                          )}
                         </tbody>
                       </Table>
                     </Card.Body>
