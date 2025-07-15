@@ -35,7 +35,6 @@ const EventBoard = () => {
       })
       .then((res) => {
         console.log("effect data : ", res.data);
-        setEvents(res.data.eventList || []);
         setPageInfo(res.data.pageInfo);
       })
       .catch(console.error);
