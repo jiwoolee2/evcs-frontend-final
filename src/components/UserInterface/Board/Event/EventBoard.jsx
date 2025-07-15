@@ -36,6 +36,7 @@ const EventBoard = () => {
       .then((res) => {
         console.log("effect data : ", res.data);
         setPageInfo(res.data.pageInfo);
+        setEvents();
       })
       .catch(console.error);
   }, [page]);
@@ -135,22 +136,23 @@ const EventBoard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {(events || [])?.map((event) => (
-                            <tr
-                              key={event.eventNo}
-                              style={{ cursor: "pointer" }}
-                              onClick={() =>
-                                navigate("/goEventDetailPage", {
-                                  state: { event: event },
-                                })
-                              }
-                            >
-                              <td>{event.eventNo}</td>
-                              <td>{event.eventName}</td>
-                              <td>{event.memberNickname}</td>
-                              <td>{event.enrollDate}</td>
-                            </tr>
-                          ))}
+                          {events &&
+                            (events || [])?.map((event) => (
+                              <tr
+                                key={event.eventNo}
+                                style={{ cursor: "pointer" }}
+                                onClick={() =>
+                                  navigate("/goEventDetailPage", {
+                                    state: { event: event },
+                                  })
+                                }
+                              >
+                                <td>{event.eventNo}</td>
+                                <td>{event.eventName}</td>
+                                <td>{event.memberNickname}</td>
+                                <td>{event.enrollDate}</td>
+                              </tr>
+                            ))}
                         </tbody>
                       </Table>
                     </Card.Body>
