@@ -182,15 +182,16 @@ const NewsMain = ({
         <S.SectionIcon>|</S.SectionIcon> 주요 뉴스
       </S.SectionHeader>
       <S.TopNewsContainer>
-        {topNews.map((item, i) => (
-          <TopNewsItem
-            key={i}
-            item={item}
-            getImageUrl={getImageUrl}
-            onChatClick={handleChatClick}
-            loading={loading}
-          />
-        ))}
+        {topNews &&
+          topNews?.map((item, i) => (
+            <TopNewsItem
+              key={i}
+              item={item}
+              getImageUrl={getImageUrl}
+              onChatClick={handleChatClick}
+              loading={loading}
+            />
+          ))}
       </S.TopNewsContainer>
     </>
   );
@@ -213,15 +214,18 @@ const NewsMain = ({
         </S.MainNewsContent>
         <S.SideContent>
           <S.SideGrid>
-            {mainNews.slice(1).map((item, i) => (
-              <SideNewsItem
-                key={i}
-                item={item}
-                getImageUrl={getImageUrl}
-                onChatClick={handleChatClick}
-                loading={loading}
-              />
-            ))}
+            {mainNews &&
+              mainNews
+                .slice(1)
+                ?.map((item, i) => (
+                  <SideNewsItem
+                    key={i}
+                    item={item}
+                    getImageUrl={getImageUrl}
+                    onChatClick={handleChatClick}
+                    loading={loading}
+                  />
+                ))}
           </S.SideGrid>
         </S.SideContent>
       </S.MainNewsSection>
@@ -232,14 +236,15 @@ const NewsMain = ({
     <S.NewsList>
       <S.NewsHeader>뉴스 리스트</S.NewsHeader>
       <S.NewsItems>
-        {listNews.map((item, i) => (
-          <ListNewsItem
-            key={i}
-            item={item}
-            onChatClick={handleChatClick}
-            loading={loading}
-          />
-        ))}
+        {listNews &&
+          listNews?.map((item, i) => (
+            <ListNewsItem
+              key={i}
+              item={item}
+              onChatClick={handleChatClick}
+              loading={loading}
+            />
+          ))}
       </S.NewsItems>
       <S.LoadMoreButton onClick={handleMore}>더보기</S.LoadMoreButton>
     </S.NewsList>
