@@ -24,7 +24,7 @@ const CommentSection = ({ newsNo, backendUrl }) => {
 
   const fetchComments = async () => {
     try {
-      const res = await axios.get(`${backendUrl}/api/news/comment/list`, {
+      const res = await axios.get(`${backendUrl}/news/comment/list`, {
         params: { newsNo },
         ...authHeader,
       });
@@ -39,7 +39,7 @@ const CommentSection = ({ newsNo, backendUrl }) => {
     if (!newComment.trim()) return;
     try {
       await axios.post(
-        `${backendUrl}/api/news/comment`,
+        `${backendUrl}/news/comment`,
         { newsNo, content: newComment },
         authHeader
       );
@@ -55,7 +55,7 @@ const CommentSection = ({ newsNo, backendUrl }) => {
     if (!replyContent.trim()) return;
     try {
       await axios.post(
-        `${backendUrl}/api/news/comment`,
+        `${backendUrl}/news/comment`,
         { newsNo, content: replyContent, parentId },
         authHeader
       );
@@ -74,18 +74,18 @@ const CommentSection = ({ newsNo, backendUrl }) => {
       if (!current) return;
 
       if (current.hasLiked) {
-        await axios.delete(`${backendUrl}/api/news/comment/like`, {
+        await axios.delete(`${backendUrl}/news/comment/like`, {
           params: { newsCmtId: commentId },
           ...authHeader,
         });
       } else {
         if (current.hasHated) {
-          await axios.delete(`${backendUrl}/api/news/comment/hate`, {
+          await axios.delete(`${backendUrl}/news/comment/hate`, {
             params: { newsCmtId: commentId },
             ...authHeader,
           });
         }
-        await axios.post(`${backendUrl}/api/news/comment/like`, null, {
+        await axios.post(`${backendUrl}/news/comment/like`, null, {
           params: { newsCmtId: commentId },
           ...authHeader,
         });
@@ -130,7 +130,7 @@ const CommentSection = ({ newsNo, backendUrl }) => {
     if (!editContent.trim()) return;
     try {
       await axios.put(
-        `${backendUrl}/api/news/comment`,
+        `${backendUrl}/news/comment`,
         {
           commentId: editingCommentId,
           content: editContent,
@@ -149,10 +149,7 @@ const CommentSection = ({ newsNo, backendUrl }) => {
     if (!token) return alert("로그인 후 이용해주세요.");
     if (!window.confirm("댓글을 삭제할까요?")) return;
     try {
-      await axios.delete(
-        `${backendUrl}/api/news/comment/${commentId}`,
-        authHeader
-      );
+      await axios.delete(`${backendUrl}/news/comment/${commentId}`, authHeader);
       fetchComments();
     } catch (error) {
       console.error("댓글 삭제 실패", error);
@@ -164,7 +161,7 @@ const CommentSection = ({ newsNo, backendUrl }) => {
     if (!window.confirm("해당 댓글을 신고하시겠습니까?")) return;
     try {
       await axios.post(
-        `${backendUrl}/api/report/comment`,
+        `${backendUrl}/report/comment`,
         {
           newsCmtId: commentId,
           reportReason: "부적절한 내용",

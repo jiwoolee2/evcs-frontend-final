@@ -27,7 +27,7 @@ const ReportComDetail = () => {
     const id = Number(rpNo);
     const fetchDetail = async () => {
       try {
-        const { data } = await axios.get(`${apiUrl}/api/usReportsCom/${id}`, {
+        const { data } = await axios.get(`${apiUrl}/usReportsCom/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -50,16 +50,12 @@ const ReportComDetail = () => {
   const cancellation = async () => {
     if (!window.confirm("신고를 정말 취소 하시겠습니까?")) return;
     try {
-      await axios.patch(
-        `${apiUrl}/api/usReportsCom/${report.reNo}/o`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.patch(`${apiUrl}/usReportsCom/${report.reNo}/o`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       alert("신고가 취소 되었습니다.");
       navigate(0);
     } catch (err) {

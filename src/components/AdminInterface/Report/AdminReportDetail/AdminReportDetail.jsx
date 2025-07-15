@@ -29,7 +29,7 @@ const AdminReportDetail = () => {
     const id = Number(rpNo);
     const fetchDetail = async () => {
       try {
-        const { data } = await axios.get(`${apiUrl}/api/reports/${id}`, {
+        const { data } = await axios.get(`${apiUrl}/reports/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -54,16 +54,12 @@ const AdminReportDetail = () => {
   const approval = async () => {
     if (!window.confirm("정말 피의자를 차단하시겠습니까?")) return;
     try {
-      await axios.patch(
-        `http://localhost:80/api/reports/${report.rpNo}/y`,
-        payload2,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.patch(`${apiUrl}/reports/${report.rpNo}/y`, payload2, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       alert("차단되었습니다");
       navigate(-1);
     } catch (err) {
@@ -79,16 +75,12 @@ const AdminReportDetail = () => {
   const refusal = async () => {
     if (!window.confirm("상태코드를 거부됨 으로 변경하시겠습니까?")) return;
     try {
-      await axios.patch(
-        `http://localhost:80/api/reports/${report.rpNo}/n`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.patch(`${apiUrl}/reports/${report.rpNo}/n`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       alert("상태코드 변경 성공");
       navigate(-1);
     } catch (err) {

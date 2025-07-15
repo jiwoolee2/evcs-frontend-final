@@ -33,7 +33,7 @@ const NewsDetail = ({ backendUrl = window.ENV.API_URL }) => {
 
     axios
       .post(
-        `${backendUrl}/api/news/detail`,
+        `${backendUrl}/news/detail`,
         {
           title,
           originUrl: originallink,
@@ -69,15 +69,15 @@ const NewsDetail = ({ backendUrl = window.ENV.API_URL }) => {
 
     const p = article.newsNo;
     Promise.all([
-      axios.get(`${backendUrl}/api/news/like/status`, {
+      axios.get(`${backendUrl}/news/like/status`, {
         params: { newsNo: p },
         ...authHeader,
       }),
-      axios.get(`${backendUrl}/api/news/hate/status`, {
+      axios.get(`${backendUrl}/news/hate/status`, {
         params: { newsNo: p },
         ...authHeader,
       }),
-      axios.get(`${backendUrl}/api/news/bookmark/status`, {
+      axios.get(`${backendUrl}/news/bookmark/status`, {
         params: { newsNo: p },
         ...authHeader,
       }),
@@ -94,19 +94,19 @@ const NewsDetail = ({ backendUrl = window.ENV.API_URL }) => {
   const updateStatus = async () => {
     const p = article.newsNo;
     const [r1, r2, r3, r4] = await Promise.all([
-      axios.get(`${backendUrl}/api/news/like/status`, {
+      axios.get(`${backendUrl}/news/like/status`, {
         params: { newsNo: p },
         ...authHeader,
       }),
-      axios.get(`${backendUrl}/api/news/hate/status`, {
+      axios.get(`${backendUrl}/news/hate/status`, {
         params: { newsNo: p },
         ...authHeader,
       }),
-      axios.get(`${backendUrl}/api/news/like`, {
+      axios.get(`${backendUrl}/news/like`, {
         params: { newsNo: p },
         ...authHeader,
       }),
-      axios.get(`${backendUrl}/api/news/hate`, {
+      axios.get(`${backendUrl}/news/hate`, {
         params: { newsNo: p },
         ...authHeader,
       }),
@@ -121,7 +121,7 @@ const NewsDetail = ({ backendUrl = window.ENV.API_URL }) => {
   const handleLike = async () => {
     if (!token) return alert("로그인 후 이용해주세요.");
     await axios.post(
-      `${backendUrl}/api/news/like`,
+      `${backendUrl}/news/like`,
       { newsNo: article.newsNo },
       authHeader
     );
@@ -131,7 +131,7 @@ const NewsDetail = ({ backendUrl = window.ENV.API_URL }) => {
   const handleHate = async () => {
     if (!token) return alert("로그인 후 이용해주세요.");
     await axios.post(
-      `${backendUrl}/api/news/hate`,
+      `${backendUrl}/news/hate`,
       { newsNo: article.newsNo },
       authHeader
     );
@@ -141,11 +141,11 @@ const NewsDetail = ({ backendUrl = window.ENV.API_URL }) => {
   const handleBookmark = async () => {
     if (!token) return alert("로그인 후 이용해주세요.");
     await axios.post(
-      `${backendUrl}/api/news/bookmark`,
+      `${backendUrl}/news/bookmark`,
       { newsNo: article.newsNo },
       authHeader
     );
-    const r = await axios.get(`${backendUrl}/api/news/bookmark/status`, {
+    const r = await axios.get(`${backendUrl}/news/bookmark/status`, {
       params: { newsNo: article.newsNo },
       ...authHeader,
     });

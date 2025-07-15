@@ -38,7 +38,7 @@ const ReportComments = () => {
         page,
         size: 10,
       };
-      const response = await axios.get(`${apiUrl}/api/usReportsCom`, {
+      const response = await axios.get(`${apiUrl}/usReportsCom`, {
         params,
         headers: {
           Authorization: `Bearer ${token}`,

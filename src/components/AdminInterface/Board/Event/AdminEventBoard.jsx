@@ -46,7 +46,7 @@ const AdminEventBoard = () => {
   const handleSearch = () => {
     setPage(1);
     axios
-      .get(`${ENV_RUL}/admin-events`, {
+      .get(`${ENV_URL}/admin-events`, {
         params: { page, category, ingCategory, searchKeyword },
       })
       .then((res) => {

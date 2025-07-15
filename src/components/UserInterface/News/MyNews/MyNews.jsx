@@ -29,7 +29,7 @@ const MyNews = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `${backendUrl}/api/news/mypage/${activeTab}`,
+          `${backendUrl}/news/mypage/${activeTab}`,
           authHeader
         );
         setFullList(res.data || []);
@@ -53,7 +53,7 @@ const MyNews = () => {
 
     if (imageUrl === "/images/loading.png") {
       try {
-        const res = await axios.get(`${backendUrl}/api/naver-image`, {
+        const res = await axios.get(`${backendUrl}/naver-image`, {
           params: { query: key },
         });
         const hits = res.data.items || [];

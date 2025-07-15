@@ -42,7 +42,7 @@ const Report = () => {
         page,
         size: 10,
       };
-      const response = await axios.get(`${apiUrl}/api/usReports`, {
+      const response = await axios.get(`${apiUrl}/usReports`, {
         params,
         headers: {
           Authorization: `Bearer ${token}`,

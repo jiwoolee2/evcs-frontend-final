@@ -34,7 +34,7 @@ const AdminReportCom = () => {
         page: page,
         size: 10,
       };
-      const response = await axios.get(`${apiUrl}/api/amReportsCom`, {
+      const response = await axios.get(`${apiUrl}/amReportsCom`, {
         params,
         headers: {
           Authorization: `Bearer ${token}`,
