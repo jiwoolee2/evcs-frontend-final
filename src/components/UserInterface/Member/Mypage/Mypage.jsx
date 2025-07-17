@@ -26,8 +26,7 @@ const MyPage = () => {
   const { auth, cancel } = useAuth();
   const navigate = useNavigate();
   const [shouldRedirect, setShouldRedirect] = useState(false);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
-
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   useEffect(() => {
     if (shouldRedirect) {
@@ -38,11 +37,15 @@ const MyPage = () => {
   const handleDeleteAccount = async () => {
     if (window.confirm("정말로 회원 탈퇴를 하시겠습니까?")) {
       try {
-        await axios.post(`${apiUrl}/admin/delete`, {}, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        await axios.post(
+          `${apiUrl}/admin/delete`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
           }
-        });
+        );
 
         toast.success("회원 탈퇴가 완료되었습니다.");
 
@@ -57,11 +60,11 @@ const MyPage = () => {
         // 리다이렉트 트리거 (여러 방법 동시에 시도)
         setShouldRedirect(true);
         navigate("/", { replace: true });
-
-
       } catch (error) {
-        console.error('회원 탈퇴 실패 : ', error);
-        toast.error(error.response?.data?.message || "회원 탈퇴에 실패했습니다.");
+        console.error("회원 탈퇴 실패 : ", error);
+        toast.error(
+          error.response?.data?.message || "회원 탈퇴에 실패했습니다."
+        );
       }
     }
   };
@@ -114,7 +117,9 @@ const MyPage = () => {
           )}
 
           <DeleteButtonWrap>
-            <DeleteButton type="button" onClick={handleDeleteAccount}>회원 탈퇴</DeleteButton>
+            <DeleteButton type="button" onClick={handleDeleteAccount}>
+              회원 탈퇴
+            </DeleteButton>
           </DeleteButtonWrap>
         </InputGroup>
       </Form>

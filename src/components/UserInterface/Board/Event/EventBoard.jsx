@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const EventBoard = () => {
-  const ENV_URL = window.ENV?.API_URL || `http://localhost:2580`;
+  const ENV_URL = window.ENV?.API_URL || `http://localhost:8080`;
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [page, setPage] = useState(1);
@@ -35,8 +35,8 @@ const EventBoard = () => {
       })
       .then((res) => {
         console.log("effect data : ", res.data);
-        setEvents(res.data.eventList);
         setPageInfo(res.data.pageInfo);
+        setEvents();
       })
       .catch(console.error);
   }, [page]);
@@ -136,22 +136,28 @@ const EventBoard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {events.map((event) => (
-                            <tr
-                              key={event.evnetNo}
-                              style={{ cursor: "pointer" }}
-                              onClick={() =>
-                                navigate("/goEventDetailPage", {
-                                  state: { event: event }, // ← 여기서 객체 넘기기
-                                })
-                              }
-                            >
-                              <td>{event.eventNo}</td>
-                              <td>{event.eventName}</td>
-                              <td>{event.memberNickname}</td>
-                              <td>{event.enrollDate}</td>
-                            </tr>
-                          ))}
+                          {events.length != 0 ? (
+                            (events || [])?.map((event) => {
+                              return (
+                                <tr
+                                  key={event.eventNo}
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    navigate("/goEventDetailPage", {
+                                      state: { event: event },
+                                    })
+                                  }
+                                >
+                                  <td>{event.eventNo}</td>
+                                  <td>{event.eventName}</td>
+                                  <td>{event.memberNickname}</td>
+                                  <td>{event.enrollDate}</td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <div>연두해요</div>
+                          )}
                         </tbody>
                       </Table>
                     </Card.Body>

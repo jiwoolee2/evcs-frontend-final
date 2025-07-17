@@ -52,7 +52,7 @@ const InsertRentCar = () => {
 
   const [options, setOptions] = useState([]); // 전체 옵션 목록
   const [selectedOptions, setSelectedOptions] = useState([]); // 선택된 옵션번호 배열
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   useEffect(() => {
     axios
       .get(`${apiUrl}/rentCar/options`) // 옵션 목록 불러오기

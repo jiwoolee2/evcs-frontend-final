@@ -12,7 +12,7 @@ const MainSwiper = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [page, setPage] = useState(1);
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   useEffect(() => {
     axios
       .get(`${apiUrl}/user-events`, {

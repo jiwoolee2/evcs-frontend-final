@@ -121,7 +121,7 @@ export default function Main() {
           <MainNewsDiv>
             <SectionTitle>오늘의 전기차 뉴스</SectionTitle>
             <NewsMainList
-              backendUrl={window.ENV?.API_URL || `http://localhost:80`}
+              backendUrl={window.ENV?.API_URL || `http://localhost:8080`}
             />
             <S.LoadMoreButton onClick={() => navigate("/newsMain")}>
               뉴스 더보기

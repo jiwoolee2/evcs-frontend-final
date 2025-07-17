@@ -6,7 +6,7 @@ import MyPageNav from "../../Common/Nav/MyPageNav";
 import { MyPageDiv } from "../../Member/Mypage/MyPage.styles";
 import * as S from "../../News/NewsMain/NewsMain.styles";
 
-const backendUrl = window.ENV?.API_URL || `http://localhost:80`;
+const backendUrl = window.ENV?.API_URL || `http://localhost:8080`;
 
 const MyNews = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,7 +29,7 @@ const MyNews = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `${backendUrl}/api/news/mypage/${activeTab}`,
+          `${backendUrl}/news/mypage/${activeTab}`,
           authHeader
         );
         setFullList(res.data || []);
@@ -53,7 +53,7 @@ const MyNews = () => {
 
     if (imageUrl === "/images/loading.png") {
       try {
-        const res = await axios.get(`${backendUrl}/api/naver-image`, {
+        const res = await axios.get(`${backendUrl}/naver-image`, {
           params: { query: key },
         });
         const hits = res.data.items || [];

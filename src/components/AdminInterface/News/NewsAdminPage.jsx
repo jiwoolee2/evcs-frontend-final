@@ -47,7 +47,7 @@ const NewsAdminPage = () => {
   const fetchCategories = async () => {
     try {
       const res = await axios.get(
-        `${backendUrl}/api/admin/news/category/all`,
+        `${backendUrl}/admin/news/category/all`,
         authHeader
       );
       setCategories(res.data);
@@ -59,10 +59,7 @@ const NewsAdminPage = () => {
   // 뉴스 리스트 불러오기
   const fetchNews = async () => {
     try {
-      const res = await axios.get(
-        `${backendUrl}/api/admin/news/list`,
-        authHeader
-      );
+      const res = await axios.get(`${backendUrl}/admin/news/list`, authHeader);
       setNewsList(res.data || []);
     } catch (err) {
       console.error("뉴스 목록 불러오기 실패", err);
@@ -104,7 +101,7 @@ const NewsAdminPage = () => {
     if (!newCategory.trim()) return;
     try {
       await axios.post(
-        `${backendUrl}/api/admin/news/category`,
+        `${backendUrl}/admin/news/category`,
         { newsCategory: newCategory },
         authHeader
       );
@@ -119,7 +116,7 @@ const NewsAdminPage = () => {
     if (!editingCategoryName.trim()) return;
     try {
       await axios.put(
-        `${backendUrl}/api/admin/news/category/${newsCategoryNo}`,
+        `${backendUrl}/admin/news/category/${newsCategoryNo}`,
         { newsCategory: editingCategoryName },
         authHeader
       );
@@ -134,7 +131,7 @@ const NewsAdminPage = () => {
   const handleDeleteCategory = async (newsCategoryNo) => {
     try {
       await axios.delete(
-        `${backendUrl}/api/admin/news/category/${newsCategoryNo}`,
+        `${backendUrl}/admin/news/category/${newsCategoryNo}`,
         authHeader
       );
       fetchCategories();
@@ -156,7 +153,7 @@ const NewsAdminPage = () => {
   const toggleStatus = async (newsNo, currentStatus) => {
     const newStatus = currentStatus === "Y" ? "N" : "Y";
     try {
-      await axios.put(`${backendUrl}/api/admin/news/status`, null, {
+      await axios.put(`${backendUrl}/admin/news/status`, null, {
         params: { newsNo, status: newStatus },
         ...authHeader,
       });

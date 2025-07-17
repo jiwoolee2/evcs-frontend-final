@@ -7,7 +7,7 @@ import axios from "axios";
 import MyPageNav from "../../../UserInterface/Common/Nav/MyPageNav";
 
 const Report = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   const navigate = useNavigate();
   const { auth } = useAuth();
@@ -42,7 +42,7 @@ const Report = () => {
         page,
         size: 10,
       };
-      const response = await axios.get(`${apiUrl}/api/usReports`, {
+      const response = await axios.get(`${apiUrl}/usReports`, {
         params,
         headers: {
           Authorization: `Bearer ${token}`,

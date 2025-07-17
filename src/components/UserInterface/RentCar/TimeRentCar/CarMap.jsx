@@ -13,7 +13,7 @@ import { PaymentButton } from "../LongTermRentCar/PaymentButton";
 import { InlineBadge } from "../RentCarCommon/RentCarCard.styles";
 
 const CarMap = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   const location = useLocation();
   const startDate = new Date(location.state.startDate);
   const endDate = new Date(location.state.endDate);

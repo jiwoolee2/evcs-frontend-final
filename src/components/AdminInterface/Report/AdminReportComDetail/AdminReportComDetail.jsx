@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 
 const AdminReportComDetail = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   const { rpNo } = useParams();
   console.log("rpNo param:", rpNo);
@@ -29,7 +29,7 @@ const AdminReportComDetail = () => {
     const id = Number(rpNo);
     const fetchDetail = async () => {
       try {
-        const { data } = await axios.get(`${apiUrl}/api/amReportsCom/${id}`, {
+        const { data } = await axios.get(`${apiUrl}/amReportsCom/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -50,7 +50,7 @@ const AdminReportComDetail = () => {
   const approval = async () => {
     if (!window.confirm("정말 피의자를 차단하시겠습니까?")) return;
     try {
-      await axios.delete(`/api/amReportsCom/${rpNo}`);
+      await axios.delete(`/amReportsCom/${rpNo}`);
       alert("차단되었습니다");
       navigate(-1);
     } catch (err) {
@@ -62,7 +62,7 @@ const AdminReportComDetail = () => {
   const refusal = async () => {
     if (!window.confirm("상태코드를 거부됨 으로 변경하시겠습니까?")) return;
     try {
-      await axios.delete(`/api/amReportsCom/${rpNo}`);
+      await axios.delete(`/amReportsCom/${rpNo}`);
       alert("상태코드 변경 성공");
       navigate(-1);
     } catch (err) {

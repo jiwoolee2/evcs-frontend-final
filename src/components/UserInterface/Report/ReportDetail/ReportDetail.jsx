@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 
 const ReportDetail = () => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
 
   const { rpNo } = useParams();
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const ReportDetail = () => {
     const id = Number(rpNo);
     const fetchDetail = async () => {
       try {
-        const { data } = await axios.get(`${apiUrl}/api/usReports/${id}`, {
+        const { data } = await axios.get(`${apiUrl}/usReports/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -50,7 +50,7 @@ const ReportDetail = () => {
   const cancellation = async () => {
     if (!window.confirm("신고를 정말 취소 하시겠습니까?")) return;
     try {
-      await axios.patch(`${apiUrl}/api/usReports/${report.rpNo}/o`, payload, {
+      await axios.patch(`${apiUrl}/usReports/${report.rpNo}/o`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

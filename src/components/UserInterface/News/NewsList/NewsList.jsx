@@ -9,7 +9,7 @@ import {
 } from "../NewsMain/NewsItemComponents";
 import * as S from "../NewsMain/NewsMain.styles";
 
-const NewsList = ({ backendUrl = "http://localhost:80" }) => {
+const NewsList = ({ backendUrl = "http://localhost:8080" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -33,7 +33,7 @@ const NewsList = ({ backendUrl = "http://localhost:80" }) => {
   ) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${backendUrl}/api/naver-news-list`, {
+      const res = await axios.get(`${backendUrl}/naver-news-list`, {
         params: {
           query: targetQuery,
           sort: targetSort,
@@ -61,7 +61,7 @@ const NewsList = ({ backendUrl = "http://localhost:80" }) => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const res = await axios.get(`${backendUrl}/api/news/categories`);
+        const res = await axios.get(`${backendUrl}/news/categories`);
         const list = res.data
           .map((item) => item.newsCategory)
           .filter((name) => name && name !== "기타");

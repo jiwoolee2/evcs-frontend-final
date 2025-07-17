@@ -42,7 +42,7 @@ const BoardModal = ({
   ref,
   fetchBoards,
 }) => {
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   const [openMapModal, setOpenMapModal] = useState(false);
   const [openRouteModal, setOpenRouteModal] = useState(false);
   const [driveRouteImage, setDriveRouteImage] = useState(null);

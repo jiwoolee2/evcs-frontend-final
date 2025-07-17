@@ -41,7 +41,7 @@ const RentCarDetails = () => {
     status,
     categoryNo,
   } = location.state;
-  const apiUrl = window.ENV?.API_URL || "http://localhost:80";
+  const apiUrl = window.ENV?.API_URL || "http://localhost:8080";
   const [optionList, setOptionList] = useState([]); // 전체 옵션 목록
   const [selectedOptions, setSelectedOptions] = useState([]); // 체크된 옵션 번호
 
