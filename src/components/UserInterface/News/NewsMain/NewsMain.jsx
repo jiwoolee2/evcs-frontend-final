@@ -24,7 +24,7 @@ const NewsMain = ({
   const [topNews, setTopNews] = useState([]);
   const [mainNews, setMainNews] = useState([]);
   const [listNews, setListNews] = useState([]);
-  const [keywords, setKeywords] = useState([]); // ✅ 카테고리 상태 추가
+  const [keywords, setKeywords] = useState([]);
 
   const handleSearch = (searchQuery = query) => {
     if (!searchQuery.trim()) return;
@@ -37,7 +37,7 @@ const NewsMain = ({
     );
 
     axios
-      .get(`${backendUrl}/api/naver-news`, {
+      .get(`${backendUrl}/naver-news`, {
         params: { query: searchQuery, display: 20, start: 1 },
       })
       .then((res) => {
