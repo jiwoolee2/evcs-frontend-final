@@ -83,7 +83,7 @@ const NewsMain = ({
       }
 
       Promise.race([
-        axios.get(`${backendUrl}/api/naver-image`, { params: { query: kws } }),
+        axios.get(`${backendUrl}/naver-image`, { params: { query: kws } }),
         new Promise((_, rej) => setTimeout(() => rej("timeout"), 5000)),
       ])
         .then((res) => {
@@ -127,7 +127,7 @@ const NewsMain = ({
     if (imageUrl === placeholder) {
       try {
         const kws = extractKeywords(key);
-        const res = await axios.get(`${backendUrl}/api/naver-image`, {
+        const res = await axios.get(`${backendUrl}/naver-image`, {
           params: { query: kws },
         });
         const hits = res.data.items || [];
@@ -159,7 +159,7 @@ const NewsMain = ({
     setLoading(true);
 
     axios
-      .get(`${backendUrl}/api/news/categories`)
+      .get(`${backendUrl}/news/categories`)
       .then((res) => {
         const list = res.data
           .map((item) => item.newsCategory)
@@ -182,16 +182,15 @@ const NewsMain = ({
         <S.SectionIcon>|</S.SectionIcon> 주요 뉴스
       </S.SectionHeader>
       <S.TopNewsContainer>
-        {topNews &&
-          topNews?.map((item, i) => (
-            <TopNewsItem
-              key={i}
-              item={item}
-              getImageUrl={getImageUrl}
-              onChatClick={handleChatClick}
-              loading={loading}
-            />
-          ))}
+        {topNews.map((item, i) => (
+          <TopNewsItem
+            key={i}
+            item={item}
+            getImageUrl={getImageUrl}
+            onChatClick={handleChatClick}
+            loading={loading}
+          />
+        ))}
       </S.TopNewsContainer>
     </>
   );
@@ -214,18 +213,15 @@ const NewsMain = ({
         </S.MainNewsContent>
         <S.SideContent>
           <S.SideGrid>
-            {mainNews &&
-              mainNews
-                .slice(1)
-                ?.map((item, i) => (
-                  <SideNewsItem
-                    key={i}
-                    item={item}
-                    getImageUrl={getImageUrl}
-                    onChatClick={handleChatClick}
-                    loading={loading}
-                  />
-                ))}
+            {mainNews.slice(1).map((item, i) => (
+              <SideNewsItem
+                key={i}
+                item={item}
+                getImageUrl={getImageUrl}
+                onChatClick={handleChatClick}
+                loading={loading}
+              />
+            ))}
           </S.SideGrid>
         </S.SideContent>
       </S.MainNewsSection>
@@ -236,15 +232,14 @@ const NewsMain = ({
     <S.NewsList>
       <S.NewsHeader>뉴스 리스트</S.NewsHeader>
       <S.NewsItems>
-        {listNews &&
-          listNews?.map((item, i) => (
-            <ListNewsItem
-              key={i}
-              item={item}
-              onChatClick={handleChatClick}
-              loading={loading}
-            />
-          ))}
+        {listNews.map((item, i) => (
+          <ListNewsItem
+            key={i}
+            item={item}
+            onChatClick={handleChatClick}
+            loading={loading}
+          />
+        ))}
       </S.NewsItems>
       <S.LoadMoreButton onClick={handleMore}>더보기</S.LoadMoreButton>
     </S.NewsList>
